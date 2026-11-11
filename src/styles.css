@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #293632;
+  background: #f3f7f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+}
+
+@theme {
+  --color-ink: #293632;
+  --color-mist: #f3f7f5;
+  --color-sky: #9dbbc7;
+  --color-sky-deep: #5590ad;
+  --color-sage: #aabbb0;
+}
+
+body { min-width: 360px; min-height: 100vh; margin: 0; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+.brand-bar {
+  display: flex;
+  min-height: 48px;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background: linear-gradient(100deg, #a9c6d0, #8eafbc);
+  padding: 0 18px;
+  color: #293632;
+  text-decoration: none;
+}
+
+.nav-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 999px;
+  color: #f3f7f5;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.nav-icon:hover { background: rgb(255 255 255 / 12%); }
+.nav-icon-active { background: #f3f7f5; color: #293632; }
+
+@media (max-width: 560px) {
+  .nav-icon { width: 36px; height: 36px; }
+  .brand-bar { min-height: 44px; padding: 0 12px; }
+}
