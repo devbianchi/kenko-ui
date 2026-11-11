@@ -13,10 +13,6 @@ Os valores destes mocks foram extraídos dos exemplos JSON em `docs/kenko-backen
 
 Home e Showcase reutilizam o nome da clínica de `shared/clinica.ts`, pois os contratos apresentam os mesmos dados da clínica.
 
-## Tipagem provisória
-
-Os documentos não declaram interfaces ou aliases TypeScript temporários. Por isso, os tipos exportados aqui são inferidos dos exemplos JSON, sem acrescentar campos ou escolher tipos de domínio não documentados. Datas e horários permanecem strings como no JSON. Os exemplos não determinam valores de produção: as imagens em `public/assets` serviram apenas para mapear telas e dados visíveis.
-
 ## Relatório inline: limpeza aplicada
 
 Itens removidos por não contribuírem para reproduzir os designs atuais em `public/assets`:

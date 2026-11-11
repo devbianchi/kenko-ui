@@ -34,7 +34,6 @@ mocks/                  dados de exemplo por domínio
 public/assets/          referências visuais aprovadas
 ```
 
-Os diretórios `mocks/` e `public/assets/` existentes foram preservados. Os mocks ainda não são consumidos pelas páginas placeholder.
 
 ## Desenvolvimento
 
