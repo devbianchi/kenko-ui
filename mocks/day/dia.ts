@@ -1,9 +1,5 @@
 // Exemplo extraído de docs/kenko-backend-api.md: 4.4 Dia — GET /api/calendar/days/2026-11-10
 export const diaMock = {
-  "meta": {
-    "timezone": "America/Sao_Paulo",
-    "evaluatedAt": "2026-11-10T12:15:00-03:00"
-  },
   "data": {
     "date": "2026-11-10",
     "summary": {
@@ -95,5 +91,6 @@ export const diaMock = {
     ]
   }
 } as const;
+
 
 export type DiaMockType = typeof diaMock;

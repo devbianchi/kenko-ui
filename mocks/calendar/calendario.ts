@@ -2,7 +2,6 @@
 export const calendarioMock = {
   "data": {
     "today": "2026-11-10",
-    "missingDateTotal": 0,
     "countsByDate": {
       "2026-09-30": 2,
       "2026-10-01": 3,

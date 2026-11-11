@@ -1,19 +1,5 @@
 // Exemplo extraído de docs/kenko-backend-api.md: 4.5 Analytics — GET /api/analytics?period=month&reference=2026-10
 export const analyticsMock = {
-  "meta": {
-    "timezone": "America/Sao_Paulo",
-    "evaluatedAt": "2026-11-10T12:15:00-03:00",
-    "period": {
-      "type": "month",
-      "reference": "2026-10",
-      "start": "2026-10-01T00:00:00-03:00",
-      "endExclusive": "2026-11-01T00:00:00-03:00"
-    },
-    "previousPeriod": {
-      "start": "2026-08-31T00:00:00-03:00",
-      "endExclusive": "2026-10-01T00:00:00-03:00"
-    }
-  },
   "data": {
     "kpis": {
       "botCompletion": {
@@ -370,5 +356,6 @@ export const analyticsMock = {
     ]
   }
 } as const;
+
 
 export type AnalyticsMockType = typeof analyticsMock;

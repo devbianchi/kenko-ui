@@ -1,14 +1,9 @@
+import { clinicaMock } from '../shared/clinica';
+
 // Exemplo extraído de docs/kenko-backend-api.md: 4.2 Home — GET /api/dashboard?month=2026-11
 export const homeMock = {
-  "meta": {
-    "timezone": "America/Sao_Paulo",
-    "evaluatedAt": "2026-11-10T12:15:00-03:00"
-  },
   "data": {
-    "clinic": {
-      "id": "clinic_1",
-      "name": "Clínica Demonstração"
-    },
+    "clinic": clinicaMock.data,
     "appointments": {
       "total": 22,
       "complete": 10,
@@ -62,5 +57,6 @@ export const homeMock = {
     ]
   }
 } as const;
+
 
 export type HomeMockType = typeof homeMock;
