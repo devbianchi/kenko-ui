@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-backend-api.md: 4.1 Clínica — GET /api/clinic
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.1 Clínica — GET /api/clinic
 export const clinicaMock = {
   "data": {
     "name": "Clínica Demonstração"

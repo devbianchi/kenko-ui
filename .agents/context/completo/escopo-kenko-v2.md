@@ -36,10 +36,10 @@ O schema físico será definido pelo integrante responsável pelo banco. Não se
 
 | Documento | Conteúdo e autoridade |
 | --- | --- |
-| Backend — endpoints, JSON e queries — kenko-backend-api.md | Contratos REST aprovados, parâmetros, exemplos de respostas, limites de analytics e consultas conceituais independentes do schema. |
-| Bot — fluxo, contratos e convenções — kenko-bot-api.md | Abordagem adotada, estado conversacional, processamento de interações, sequência completa de requisições/respostas, validações e integridade. Também identifica alternativas não adotadas. |
+| [Backend — endpoints, JSON e queries](kenko-backend-api.md) | Contratos REST aprovados, parâmetros, exemplos de respostas, limites de analytics e consultas conceituais independentes do schema. |
+| [Bot — fluxo, contratos e convenções](kenko-bot-api.md) | Abordagem adotada, estado conversacional, processamento de interações, sequência completa de requisições/respostas, validações e integridade. Também identifica alternativas não adotadas. |
 
-Este escopo define as regras funcionais e métricas. Os complementos detalham como atendê-las e devem ser usados em conjunto no planejamento, implementação e revisão. JSONs são exemplos de contrato, não dados hardcoded; SQL é ilustrativa e não substitui a modelagem do banco. Alternativas expressamente não adotadas no documento do bot não são requisitos adicionais.
+Este escopo preserva a base original de regras funcionais e métricas. Para tarefas de frontend, comece pelo [contexto resumido](../contexto-front.md), que incorpora decisões posteriores aprovadas. Consulte somente as seções pertinentes dos complementos quando precisar de detalhes de integração. JSONs são exemplos de contrato, não dados hardcoded; SQL é ilustrativa e não substitui a modelagem do banco. Alternativas expressamente não adotadas no documento do bot não são requisitos adicionais.
 
 ## 2. Limites e participantes
 

@@ -12,15 +12,17 @@ Terse style applies to the final report only. While working, do the work: read t
 ## 1. Inputs
 
 - The request given to the implementer, and any plan or return list it named.
-- The area's conventions, including "Review focus" and "Commands".
+- The area context file.
 - The implementer's report and behavior map, if any.
 - The repository: `git status`, `git diff`, the files.
 
 | Area | File |
 |---|---|
-| Frontend | Frontend conventions still not created. |
+| Frontend | [Frontend context](../../context/contexto-front.md) |
 
-If a convention contradicts the code, trust the code and report the mismatch.
+Read the context introduction and the sections relevant to the task; follow its routes to visual references or specific API contracts only when needed. Approved requirements define expected behavior. Existing code/configuration describes the technical state, not authority to override requirements. Report unresolved differences; do not rewrite requirements to match incomplete code.
+
+Follow the [UI test conventions](../../context/contexto-front.md#testes-de-ui-ferramentas-e-organização) for tools, test folders and current prototype scope. Use the README commands and preserve the check distribution below. Lint is not configured yet; report it as unavailable, never passed.
 
 ## 2. Process
 
@@ -28,7 +30,7 @@ If a convention contradicts the code, trust the code and report the mismatch.
 2. **Read** the whole diff, then the changed files in context. Verify each ID on disk with file and line: code exists, test exists, test asserts the right thing.
 3. **Review** against section 3 and record findings, sorting each into: fix now (section 5), report (section 6), or nit.
 4. **Fix pass** (section 5): apply every fixable finding now, including missing tests. Log each.
-5. **Run checks once, on the final code**: typecheck, lint on touched files, any other convention-required gate such as the frontend build, then the full suite. The full suite already contains the specs covering the change; do not run them separately first. Do not run checks before the fix pass; they would be repeated. If something fails because of a refactor of yours, revert that refactor and report it. A test you added that fails because the behavior is wrong is evidence: keep it (section 5).
+5. **Run checks once, on the final code**: typecheck, lint on touched files, the frontend build and any task-required gate, then the full suite. If the build includes the required typecheck, do not repeat it. The full suite already contains the specs covering the change; do not run them separately first. Do not run checks before the fix pass; they would be repeated. If something fails because of a refactor of yours, revert that refactor and report it. A test you added that fails because the behavior is wrong is evidence: keep it (section 5).
 6. **Mutation checks** (section 4) on protection tests and on tests you added, with the code in its final state.
 7. **Report** (section 8).
 
@@ -38,7 +40,7 @@ If a convention contradicts the code, trust the code and report the mismatch.
 
 **Security and data.** Authorization on every path, input validation, injection, data exposure, secrets, destructive operations.
 
-**Executed, not just read.** Behavior that lives outside plain code (SQL, migrations, driver or config settings) is verified by running it. Code that no test reaches is unverified.
+**Executed, not just read.** Behavior that depends on rendering, browser storage, routing, HTTP handling or configuration is verified by running it. Code that no test reaches is unverified.
 
 **Simplicity.** Is it the smallest sound solution? Flag over-engineering: speculative abstractions, unused options, unnecessary dependencies. Flag the opposite too: real border cases left untreated.
 
@@ -54,7 +56,7 @@ If a convention contradicts the code, trust the code and report the mismatch.
 
 **Scope and process.** Diff matches the request. No unrelated changes, no new dependency. Obstacle fixes in the report: confirm each was safe and that no test was weakened to get past it.
 
-**Area focus.** Apply the "Review focus" from the conventions if any exist.
+**Area focus.** Use the affected behaviors and acceptance criteria in the frontend context.
 
 ## 4. Tradeoffs and mutation checks
 
@@ -76,11 +78,11 @@ Default is to fix. In files the change touched, apply directly, without asking:
 
 **Fix-or-justify rule.** Every finding in the categories above is either fixed or listed under `Not fixed` with a specific reason (which boundary it crosses, which caller outside the diff it affects). "Too large" or "needs design" without naming the concrete blocker is not a valid reason. A fixable finding left in `Should fix` is a failure of this review.
 
-**Tests: add what is missing.** You may add and strengthen tests in the specs the change touched, or in new specs where the conventions' layout calls for them:
+**Tests: add what is missing.** You may add and strengthen tests in the specs the change touched, or in new specs in the relevant tests/ folder defined by the context:
 - Add a test for every ledger ID, request item or contract line that has none, and for the border cases from your own checklist.
 - Strengthen weak tests: add the missing positive control, the effect check (state unchanged after a rejection), the specific expected value. Fix a test whose name claims what its body does not check (a "persists null on create" test that only edits).
-- Follow the conventions' test section: valid bodies, factories and helpers, `it.each` rows, no shared state, one behavior per test.
-- Test at the level where the contract lives. A schema-only test does not prove an endpoint uses the schema.
+- Follow the repository test setup: valid inputs, existing factories/helpers, parameterized cases when useful, no shared state, one behavior per test.
+- Test at the level where the contract lives. A parser-only test does not prove the component handles its result.
 - Never weaken, skip or delete a test. Never change production code to make a test pass.
 - Proof it can fail: mutation-check it (section 4), or it already fails on current code because the behavior is wrong. In that case keep the failing test in the tree, list it under Must fix with the failing assertion, and put it in the return list. The implementer fixes the code against it.
 - Log each: `path:line - ID - what it proves - proven by <mutation / fails on current code>`.

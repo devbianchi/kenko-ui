@@ -1,6 +1,6 @@
 import { clinicaMock } from '../../shared/clinica';
 
-// Exemplo extraído de docs/kenko-bot-api.md: 6.4 Informações da clínica
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 6.4 Informações da clínica
 export const informacoesDaClinicaMock = {
   "messages": [
     {

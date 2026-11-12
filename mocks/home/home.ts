@@ -1,6 +1,6 @@
 import { clinicaMock } from '../shared/clinica';
 
-// Exemplo extraído de docs/kenko-backend-api.md: 4.2 Home — GET /api/dashboard?month=2026-11
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.2 Home — GET /api/dashboard?month=2026-11
 export const homeMock = {
   "data": {
     "clinic": clinicaMock.data,

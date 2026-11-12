@@ -9,32 +9,33 @@ You own the task end to end: understand it, decide, implement, test, resolve obs
 
 ## 1. Conventions
 
-Read the conventions for the area before deciding anything.
+Start with the frontend context before making implementation decisions.
 
 | Area | File |
 |---|---|
-| Frontend | Frontend conventions still not created. |
+| Frontend | [Frontend context](../../context/contexto-front.md) |
 
 
-The conventions' "Commands" section lists the exact commands and which checks to run for which kind of change. Use them as written. If missing, find them in `package.json` and state which you chose.
-If a convention contradicts the code, trust the code, report the mismatch, fix the file if your task touches that rule.
+Read the context introduction and the sections relevant to the task; follow its routes to visual references or specific API contracts only when needed. Approved requirements define expected behavior. Existing code/configuration describes the technical state, not authority to override requirements. Report unresolved differences; do not rewrite requirements to match incomplete code.
+
+Follow the [UI test conventions](../../context/contexto-front.md#testes-de-ui-ferramentas-e-organização) for tools, test folders and current prototype scope. Use the README commands and preserve the check distribution below. Lint is not configured yet; report it as unavailable, never passed.
 
 ## 2. Start
 
 1. Read the request, then the code it touches. Reuse what exists.
 2. `git status`. Unrelated changes in the tree: report, never mix in.
-3. Confirm every path you will edit exists. Use repo-relative paths.
+3. Inspect existing files before editing; identify intentional new files and their responsibilities. Use repo-relative paths in the ledger.
 4. Inputs that add to the request: a plan or backlog item it names (`.agents/plans/`), or a reviewer's return list. Their items are mandatory ledger entries (section 3).
 
 ## 3. Behavior ledger (your plan and your definition of done)
 
-No separate planner exists. Write the ledger in your first message, before editing. For small fixes it can be 1-3 lines.
+Use an existing plan when supplied. Write the ledger after reading the relevant context and before editing. For small fixes it can be 1-3 lines.
 
 **Goal:** one line.
 
 **Ledger:** numbered B1..Bn. Each ID is one observable behavior (an input, a condition, an outcome), not a code task.
 
-- Source of IDs: the request; every item of a named plan or return list, copied verbatim and tagged `(plan)` or `(review)`; and the edge cases below.
+- Source of IDs: the request; every item of a named plan or return list, mapped to observable behaviors with its source reference and tagged `(plan)` or `(review)`; and the edge cases below.
 - For each behavior, apply this checklist and add an ID for every case that is real here, with the expected outcome (status code, error, unchanged state):
   empty / null / missing field, invalid input, duplicate, not found, wrong owner / no permission, unauthenticated, boundary values, concurrency or ordering where it matters, side effects that must NOT happen when it is rejected.
 - Skip cases that cannot occur here. Do not invent cases; do not leave real ones out.
@@ -59,7 +60,7 @@ Only when: the answer changes a public contract, data semantics or security beha
 ## 5. Implement
 
 - Work in coherent units (component, hook). Write the unit's tests in the same unit, before moving on.
-- Before creating a multi-file frontend feature, sketch each file's responsibility using the existing app layout. Colocate tests and group files only where distinct responsibilities justify a subfolder; avoid a flat feature root that mixes pages, reusable components, and data access.
+- Before creating a multi-file frontend feature, sketch each file's responsibility using the existing app layout. Put colocated tests in the dedicated tests/ folders defined by the context and group production files only where distinct responsibilities justify a subfolder; avoid a flat feature root that mixes pages, reusable components, and data access.
 - Code a human reviews one module at a time: small functions with one job, names that say what a thing holds or does, early returns, no clever one-liners.
 - Comment the why (constraint, border case, workaround, security reason). Do not narrate the code. Remove comments your change made stale.
 - Stay in scope. No unrelated refactors or formatting churn. Problems outside the task go in the report, unfixed.
@@ -72,14 +73,14 @@ Only when: the answer changes a public contract, data semantics or security beha
 
 A behavior without a test is not done.
 
-- Every ledger ID has a test at the lowest level that proves it, following the conventions' test section. Test where the contract actually lives: a schema-only test does not prove an endpoint uses the schema.
+- Every ledger ID has a test at the lowest level that proves it, following the repository test setup. Test where behavior lives: testing a parser alone does not prove the component handles its result.
 - Write tests that can fail. Before finishing each test, check:
   - it asserts the specific expected value, not just equality between two responses or "not 200";
   - a rejection test uses an otherwise valid request, so the rejection is for the intended reason;
   - a protection test (auth, ownership, validation) has a positive control showing the same call succeeds when allowed;
   - a rejected write/delete is followed by a check that state is unchanged.
 - No shared state or order dependence between tests.
-- Code that never ran is unverified. Every new behavior must be reached by a test, or by a probe you ran and recorded in the report. Typecheck and lint do not prove it works.
+- Code that never ran is unverified. Every new behavior must be reached by a test you ran and recorded in the report. Probes may supplement tests, not replace them. Typecheck and lint do not prove it works.
 - Never weaken, skip or delete a test to make it pass.
 - Mutation-proving protection tests is the reviewer's job. Your job is to write them so they would fail.
 
@@ -92,11 +93,11 @@ Fast loop, during the work:
 Final gate, once, after the last unit:
 1. Typecheck.
 2. Lint on touched files only.
-3. Full suite only when the conventions' table calls for it (shared code such as test helpers or setup, middleware, the error handler). Otherwise the reviewer runs it once.
-4. Run any other final gate required by the area's conventions, such as the frontend build.
+3. Full suite only when changing test helpers/setup or shared infrastructure whose impact spans features (for example shared client state, API client or error handling). Otherwise the reviewer runs it once.
+4. Run the frontend build and any other gate required by the task. If the build already ran the required typecheck, do not duplicate it.
 5. If a gate fails, fix and rerun only that gate. No reruns after edits that changed no code.
 
-Pick checks with the conventions' "which check for which change" table. When the full suite ran green, do not rerun targeted specs.
+Use the installed scripts/configuration for these checks. When the full suite ran green, do not rerun targeted specs.
 
 Do not run Prettier by hand; only if lint reports formatting. Never claim a result you did not see; write "not run".
 
@@ -108,13 +109,13 @@ When something blocks the task, investigate the cause before changing anything, 
 
 **Environment or data problem: stop on that part only.** Existing data that conflicts with your change, shared or production state, anything irreversible. Record exactly what conflicts and how much of it, mark the dependent IDs `blocked`, give the options with tradeoffs and a recommendation, and finish everything that does not depend on the decision.
 
-**Stop and ask:** the cases in section 4, plus a new dependency; a fix that needs a weakened test or silenced tooling; editing a migration or any artifact already committed or applied elsewhere (add a new one instead).
+**Stop and ask:** the cases in section 4, plus a new dependency; a fix that needs a weakened test or silenced tooling; changing an immutable artifact already applied to shared data, such as an applied migration (add a new one instead). Ordinary versioned source files do not require approval just because they were committed.
 
 Record every obstacle: what failed (command and error), root cause, what you changed (path), how you verified. If unresolved, say what you tried and what remains.
 
 ## 9. Before reporting
 
-1. For each ledger ID, open the code and the test, confirm they exist and match the behavior. Get line numbers with `Select-String` (PowerShell has no `grep`) or `git diff -U0` at this moment, never from memory.
+1. For each ledger ID, open the code and the test, confirm they exist and match the behavior. Get line numbers with `rg -n`, `Select-String` or `git diff -U0` at this moment, never from memory.
 2. Re-read the diff against the request and the ledger.
 3. Remove leftovers: unused code, debug output, stale comments.
 
@@ -133,7 +134,7 @@ Status: <n>/<n> IDs done. Blocked / not done: <ID> - <why, what you tried>
 ### File map
 | File | Role | Change |
 |------|------|--------|
-(one row per changed file; role = schema / dao / service / controller / test / shared / config)
+(one row per changed file; role = page / component / hook / data access / test / shared / styles / config / documentation)
 
 Decisions: <choice> | why | rejected: <alternatives>
 Obstacles: <what failed> | cause | fix (path) | verified by
@@ -142,7 +143,7 @@ Outside scope (not fixed): ...
 Open: ...
 ```
 
-Status values: `done`, `done-no-test (reason)`, `blocked`, `not done`.
+Status values: `done`, `blocked`, `not done`.
 
 ## 11. Git
 

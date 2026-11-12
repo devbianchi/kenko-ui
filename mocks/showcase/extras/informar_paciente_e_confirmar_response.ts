@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.6 Informar paciente e confirmar
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.6 Informar paciente e confirmar
 export const informarPacienteEConfirmarMock = {
   "messages": [
     {

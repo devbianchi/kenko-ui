@@ -126,7 +126,7 @@ As listagens de conversas e agendamentos são especificadas no documento da API.
 ### 4.3 Resposta
 
 - `conversation`: estado público mínimo — id, effectiveStatus, revision, step, attemptId.
-- `messages`: somente mensagens novas retornadas pelo processamento de ação; frontend adiciona à transcrição local.
+- `messages`: mensagens novas do bot retornadas pelo processamento de ação; frontend adiciona à transcrição local. O frontend também registra as entradas do usuário nessa transcrição, distinguindo autor e horário.
 - `view`: controles/dados atuais para renderização.
 - `availableActions`: ações globais, como exit, permitidas agora.
 - `result`: resultado estruturado de confirmação/cancelamento, quando existir.
@@ -246,7 +246,7 @@ Registrar resposta e SLOT_SEARCH_RESULT. Não introduzir pergunta de rotina/aval
 }
 ```
 
-Validar opção da tentativa e registrar SELECTED_SLOT. A seleção não reserva o horário nem garante que continuará livre até confirmar. Não existe bloqueio temporário de disponibilidade aprovado.
+Validar opção da tentativa, início futuro e disponibilidade já na seleção; a escolha pode ser rejeitada se o horário não estiver mais disponível. Registrar SELECTED_SLOT para uma seleção válida. A seleção não reserva o horário nem garante que continuará livre até confirmar, quando a disponibilidade é revalidada. Não existe bloqueio temporário de disponibilidade aprovado.
 
 ### 5.6 Informar paciente e confirmar
 
@@ -484,7 +484,7 @@ Somente então devolver sucesso
 
 Restrição, bloqueio ou combinação dependem do SGBD. Consultar livre e inserir depois sem proteção não atende ao requisito. Em falha, não pode restar reserva sem confirmação correspondente, confirmação sem reserva ou paciente duplicado pelo reenvio.
 
-Se outro atendimento reservou o horário, não devolver sucesso. Informar conflito, consultar novas opções e devolver estado atualizado para escolha. Essa busca efetiva registra seus próprios resultados; repetir a mesma ação não a repete. A resposta de conflito pode usar 409 com `error` e o estado/view de recuperação; o frontend não descarta a view por ser erro. Se a recuperação exigir novo registro, persistir esse resultado e revisão de forma consistente.
+Se outro atendimento reservou o horário, recusar a seleção ou confirmação, sem devolver sucesso. Informar conflito, consultar novas opções e devolver estado atualizado para escolha. Essa busca efetiva registra seus próprios resultados; repetir a mesma ação não a repete. A resposta de conflito pode usar 409 com `error` e o estado/view de recuperação; o frontend não descarta a view por ser erro. Se a recuperação exigir novo registro, persistir esse resultado e revisão de forma consistente.
 
 Cancelar também exige validar conversa, origem, revisão e status dentro da operação consistente. Registrar cancelamento sem apagar a reserva e retornar menu. Consultas completas são recusadas; já canceladas não são canceladas novamente como nova operação. A reexecução da mesma actionId devolve o resultado anterior sem alterar dados.
 

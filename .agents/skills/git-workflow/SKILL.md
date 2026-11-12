@@ -5,12 +5,12 @@ description: Create task branches, commit reviewed work in logical commits, push
 
 # Git workflow
 
-Use this only when the user's request says to branch, commit, push or merge. Do each step only if it was requested. Shell is Windows PowerShell: chain commands with `;`.
+Use this only when the user's request says to branch, commit, push or merge. Do each step only if it was requested. Shell is Windows PowerShell. Run dependent Git commands separately and check each exit code before continuing. A failed switch or pull must stop the sequence; `;` does not provide that guarantee.
 
 ## 1. Branch
 
 - Name: `<type>/<short-topic>`, with type one of `feat`, `fix`, `refactor`, `test`, `chore`, `docs` (example: `feat/money-numeric`).
-- Start from an up-to-date main: `git switch main; git pull --ff-only; git switch -c <name>`.
+- Start from an up-to-date main: run `git switch main`, then `git pull --ff-only`, then `git switch -c <name>`, verifying success at each step.
 - If uncommitted changes already exist on main, `git switch -c <name>` carries them to the new branch. Check `git status` first and report anything unrelated to the task.
 - Never commit on `main` or `master`. If you are on one, create a branch first.
 
@@ -25,7 +25,7 @@ Preconditions: the user asked for the commit. If a review exists and its verdict
 5. Add the co-author trailer. Copy it from a previous commit (`git log -5`); if none has one, ask.
 6. `git show --stat HEAD` after each commit.
 
-`.agents/plans` is git-ignored. Never use `git add -f` on it unless asked. Everything else under `.agents/` is not ignored and can be committed like any other change.
+Plans in `.agents/plans/` can be versioned, like other documentation under `.agents/`. Stage only files belonging to the requested change.
 
 ## 3. Push a branch
 
@@ -36,8 +36,12 @@ Only when asked: `git push -u origin <branch>`. Never force-push. Never push `ma
 Only when asked, with the branch pushed and the full suite green on it (the reviewer's run counts if nothing changed since).
 
 ```
-git switch main; git pull --ff-only; git merge --no-ff <branch> -m "Merge <branch>: <summary>"
+git switch main
+git pull --ff-only
+git merge --no-ff <branch> -m "Merge <branch>: <summary>"
 ```
+
+Run these commands individually, proceeding only after each succeeds.
 
 - `--no-ff` always creates a merge commit, so the branch stays visible in the history and in GitHub's graph as a unit.
 - Push `main` only if the user asked: `git push`.

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-backend-api.md: 4.4 Dia — GET /api/calendar/days/2026-11-10
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.4 Dia — GET /api/calendar/days/2026-11-10
 export const diaMock = {
   "data": {
     "date": "2026-11-10",

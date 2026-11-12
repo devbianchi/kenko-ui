@@ -1,28 +1,43 @@
 # Mocks do frontend
 
-Os valores destes mocks foram extraídos dos exemplos JSON em `docs/kenko-backend-api.md` e `docs/kenko-bot-api.md`. Os campos mantidos preservam os nomes e valores de origem; os tipos exportados são derivados das constantes (`typeof`).
+Fixtures visuais simplificados para composição das telas. Não representam contratos completos da API nem valores fixos de aceitação. Os tipos exportados derivam das constantes (typeof/as const): descrevem esses exemplos, não os tipos gerais da integração.
 
-## Pastas
+Origem: exemplos da [API, §4](../.agents/context/completo/kenko-backend-api.md#4-exemplos-json) e do [bot, §5–6](../.agents/context/completo/kenko-bot-api.md#5-exemplos-json-caminho-completo-de-agendamento). Campos mantidos preservam nomes e valores dos exemplos. Na integração, consultar o contrato da operação e as regras do [contexto](../.agents/context/contexto-front.md).
 
-- `home`: resumo mensal e próximas consultas.
-- `calendar`: contagens por data para a grade mensal.
-- `day`: resumo, distribuição por hora/período e salas de um dia.
-- `analytics`: KPIs, funil e séries analíticas.
-- `showcase`: respostas usadas para as telas do Showcase.
-- `shared`: dados da clínica e listas de conversas reaproveitados por telas/fluxos.
+## Catálogo
 
-Home e Showcase reutilizam o nome da clínica de `shared/clinica.ts`, pois os contratos apresentam os mesmos dados da clínica.
+| Área | Fixture | Conteúdo |
+| --- | --- | --- |
+| Home | [home.ts](home/home.ts) | Resumo mensal e próximas consultas. |
+| Calendário | [calendario.ts](calendar/calendario.ts) | Contagens por data. |
+| Dia | [dia.ts](day/dia.ts) | Resumo, distribuições e salas. |
+| Analytics | [analytics.ts](analytics/analytics.ts) | KPIs, funil e séries. |
+| Compartilhado | [clinica.ts](shared/clinica.ts) | Nome da clínica, reutilizado por Home e Showcase. |
+| Compartilhado | [lista_de_conversas.ts](shared/lista_de_conversas.ts) | Estado/atividade das conversas. |
+| Showcase | [criar_conversa_response.ts](showcase/criar_conversa_response.ts) | Apresentação inicial. |
 
-## Relatório inline: limpeza aplicada
+### Cenários do Showcase
 
-Itens removidos por não contribuírem para reproduzir os designs atuais em `public/assets`:
+- [abandono_historico_e_ocultacao_response](showcase/extras/abandono_historico_e_ocultacao_response.ts)
+- [abrir_lista_de_agendamentos_response](showcase/extras/abrir_lista_de_agendamentos_response.ts)
+- [cancelar_reserva_pendente_response](showcase/extras/cancelar_reserva_pendente_response.ts)
+- [escolher_agendar_response](showcase/extras/escolher_agendar_response.ts)
+- [escolher_horario_response](showcase/extras/escolher_horario_response.ts)
+- [informacoes_da_clinica_response](showcase/extras/informacoes_da_clinica_response.ts)
+- [informar_paciente_e_confirmar_response](showcase/extras/informar_paciente_e_confirmar_response.ts)
+- [ler_estado_sem_registrar_atividade_response](showcase/extras/ler_estado_sem_registrar_atividade_response.ts)
+- [primeira_consulta_e_resultado_da_busca_response](showcase/extras/primeira_consulta_e_resultado_da_busca_response.ts)
+- [responder_especialidade_response](showcase/extras/responder_especialidade_response.ts)
+- [sair_response](showcase/extras/sair_response.ts)
+- [sem_horarios_response](showcase/extras/sem_horarios_response.ts)
+- [validacao_por_etapa_response](showcase/extras/validacao_por_etapa_response.ts)
 
-- Arquivos de payload de entrada em `showcase/requests/` e a pasta vazia.
-- `showcase/estado_logico.ts`, estado interno da conversa sem representação visual.
-- `shared/erro_response.ts` e `shared/reservas_da_conversa.ts`, respostas sem estado correspondente nos designs fornecidos.
-- Nas respostas de Showcase: `id`, `effectiveStatus`, `revision`, `step`, `attemptId`, `availableActions` e `result`; os objetos `conversation` vazios após essa remoção também foram retirados.
-- Em `shared/clinica.ts`: `id`, `address`, `phone`, `openingHours` e `specialties`; ficou apenas o nome usado no cabeçalho, compartilhado com Home e Showcase.
-- `calendar.data.missingDateTotal`, que não possui componente na grade.
-- Metadados `meta` em Home, Dia e Analytics. O gráfico do Dia mantém todas as horas de 0h a 23h e as contagens correspondentes do exemplo original.
+## Simplificações
 
-Esta nota registra a limpeza realizada. Os valores que permaneceram foram preservados dos exemplos documentados.
+- Showcase não mantém IDs, effectiveStatus, revision, step, attemptId, availableActions ou result; objetos conversation vazios foram removidos. Isso inclui IDs necessários a escolhas e deduplicação na integração.
+- shared/clinica.ts conserva apenas o nome. Endereço, telefone, expediente e especialidades continuam necessários ao fluxo de informações da clínica.
+- Calendário omite missingDateTotal; datas ausentes no mapa representam zero conforme o contrato.
+- Home, Dia e Analytics omitem meta. O Dia conserva as 24 horas e as contagens originais.
+- Payloads de entrada, estado interno, erro genérico e listagem independente de reservas não têm fixtures próprios. Os contratos completos continuam nos complementos técnicos; a ausência de um cenário não elimina o requisito.
+
+O conjunto serve à apresentação, não simula todas as transições ou garantias do bot. Não preencher lacunas de contrato por inferência dos fixtures nem usar sua existência como evidência de funcionalidade implementada.

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.1 Criar conversa — POST /api/conversations
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.1 Criar conversa — POST /api/conversations
 export const criarConversaMock = {
   "messages": [
     {

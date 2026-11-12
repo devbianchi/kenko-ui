@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-backend-api.md: 4.5 Analytics — GET /api/analytics?period=month&reference=2026-10
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.5 Analytics — GET /api/analytics?period=month&reference=2026-10
 export const analyticsMock = {
   "data": {
     "kpis": {

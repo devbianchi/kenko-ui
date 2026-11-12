@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 10. Abandono, histórico e ocultação
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 10. Abandono, histórico e ocultação
 export const abandonoHistoricoEOcultacaoMock = {
   "error": {
     "code": "CONVERSATION_ABANDONED",

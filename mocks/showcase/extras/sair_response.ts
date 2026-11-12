@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 6.6 Sair
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 6.6 Sair
 export const sairMock = {
   "messages": [
     {

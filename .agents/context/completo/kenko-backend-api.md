@@ -42,7 +42,7 @@ Analytics devolve o período resolvido e o período anterior porque a interface 
 | --- | --- | --- |
 | `week` | `2026-11-10` | Sete datas, de 04/11 a 10/11, com pontos diários. |
 | `month` | `2026-10` | Mês indicado; blocos 1–7, 8–14, 15–21, 22–28, 29–fim. |
-| `year` | `2026` | Ano corrente: janeiro até o mês atual; ano anterior: doze meses. |
+| `year` | `2026` | Ano corrente: janeiro até o mês atual; anos anteriores: doze meses. Ano futuro não é permitido. |
 
 Para a agenda, períodos selecionados incluem a capacidade futura desses períodos. Eventos conversacionais considerados são os já existentes até `evaluatedAt`. O período do ano corrente termina no início do mês seguinte ao atual; mês selecionado termina no início do mês seguinte. A comparação usa intervalo imediatamente anterior de mesma duração, não necessariamente mês anterior de calendário. A semana de sete dias do filtro é distinta da semana domingo–sábado usada na seleção de horários pelo bot.
 

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 6.1 Ler estado sem registrar atividade — GET /api/conversations/cv_1
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 6.1 Ler estado sem registrar atividade — GET /api/conversations/cv_1
 export const lerEstadoSemRegistrarAtividadeMock = {
   "conversation": {
     "startedAt": "2026-11-10T12:00:00-03:00",

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.5 Escolher horário
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.5 Escolher horário
 export const escolherHorarioMock = {
   "messages": [
     {
