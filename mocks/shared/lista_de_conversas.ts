@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-backend-api.md: 4.6 Lista de conversas — GET /api/conversations?ids=cv_1,cv_2
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.6 Lista de conversas — GET /api/conversations?ids=cv_1,cv_2
 export const listaDeConversasMock = {
   "meta": {
     "timezone": "America/Sao_Paulo",

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.2 Escolher Agendar — POST /api/conversations/cv_1/interactions
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.2 Escolher Agendar — POST /api/conversations/cv_1/interactions
 export const escolherAgendarMock = {
   "messages": [
     {

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-backend-api.md: 4.3 Calendário — intervalo visível enviado na requisição
+// Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.3 Calendário — intervalo visível enviado na requisição
 export const calendarioMock = {
   "data": {
     "today": "2026-11-10",

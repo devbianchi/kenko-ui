@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 6.2 Abrir lista de agendamentos
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 6.2 Abrir lista de agendamentos
 export const abrirListaDeAgendamentosMock = {
   "messages": [
     {

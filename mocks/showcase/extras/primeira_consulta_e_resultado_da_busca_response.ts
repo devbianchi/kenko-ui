@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.4 Primeira consulta e resultado da busca
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.4 Primeira consulta e resultado da busca
 export const primeiraConsultaEResultadoDaBuscaMock = {
   "messages": [
     {

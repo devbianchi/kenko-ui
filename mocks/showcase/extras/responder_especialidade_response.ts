@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 5.3 Responder especialidade
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 5.3 Responder especialidade
 export const responderEspecialidadeMock = {
   "messages": [
     {

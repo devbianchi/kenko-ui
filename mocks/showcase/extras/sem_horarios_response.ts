@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 6.5 Sem horários
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 6.5 Sem horários
 export const semHorariosMock = {
   "messages": [
     {

@@ -1,4 +1,4 @@
-// Exemplo extraído de docs/kenko-bot-api.md: 8.1 Validação por etapa
+// Exemplo extraído de .agents/context/completo/kenko-bot-api.md: 8.1 Validação por etapa
 export const validacaoPorEtapaMock = {
   "error": {
     "code": "STALE_CONVERSATION_STATE",
