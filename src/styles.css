@@ -1,25 +1,47 @@
-@import 'tailwindcss';
-
-:root {
-  --gradient-brand: linear-gradient(100deg, var(--color-gradient-start), var(--color-gradient-end));
-  --color-nav-hover: rgb(255 255 255 / 12%);
-  font-family: var(--font-body);
-  color: var(--color-foreground);
-  background: var(--color-background);
-  color-scheme: light;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
-}
+@import "tailwindcss";
 
 @theme static {
+  --animate-pop-in: pop-in 180ms ease-out;
+
+  @keyframes pop-in {
+    from {
+      transform: scale(0.97);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  --text-label: 0.875em;
+  --text-body: 1em;
+  --text-section: 1.25em;
+  --text-brand: 1.75em;
+  --text-metric: 2em;
+  --text-page: 3.5em;
+  --text-count: 3.75em;
+  --text-month: 4.5em;
+  --container-dashboard-header: 72em;
+  --spacing-status-card: 9.5em;
+  --spacing-metric-card: 10.5em;
+  --spacing-sidebar: 14em;
+  --background-image-brand: linear-gradient(
+    100deg,
+    var(--color-gradient-start),
+    var(--color-gradient-end)
+  );
+  --color-nav-hover: rgb(255 255 255 / 12%);
+  --color-field-background: var(--color-background);
+  --color-focus-ring: var(--color-secondary);
+  --shadow-card: 0 2px 4px rgb(41 54 50 / 18%), 0 0 4px rgb(41 54 50 / 4%);
+  --shadow-card-hover: 0 6px 14px rgb(41 54 50 / 13%);
+  --radius-card: 1em;
   --color-foreground: #293632;
   --color-background: #f5f8f6;
   --color-border: #c9d8d2;
   --color-gray: #a9bab2;
-  --color-text-muted: rgba(41, 54, 50, 0.60);
+  --color-text-muted: rgba(41, 54, 50, 0.6);
   --color-primary: #568dab;
   --color-secondary: #28627e;
   --color-tertiary: #8fc5d8;
@@ -33,47 +55,6 @@
   --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body: "42dot Sans", ui-sans-serif, system-ui, sans-serif;
   --font-brand: "Rhodium Libre", ui-serif, Georgia, serif;
-  --font-brand-japanese: "Zen Maru Gothic", ui-sans-serif, system-ui, sans-serif;
-}
-
-@layer base {
-  h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
-}
-
-body { min-width: 360px; min-height: 100vh; margin: 0; }
-button, a { -webkit-tap-highlight-color: transparent; }
-
-.brand-bar {
-  display: flex;
-  min-height: 48px;
-  flex: 1;
-  align-items: center;
-  gap: 10px;
-  border-radius: 10px;
-  background: var(--gradient-brand);
-  padding: 0 18px;
-  color: var(--color-foreground);
-  text-decoration: none;
-}
-
-.brand-wordmark {
-  /* Compensa o espaço assimétrico da Rhodium Libre acima e abaixo das maiúsculas. */
-  transform: translateY(0.12em);
-}
-
-.nav-icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border-radius: 999px;
-  color: var(--color-background);
-  transition: background-color 140ms ease, color 140ms ease;
-}
-.nav-icon:hover { background: var(--color-nav-hover); }
-.nav-icon-active { background: var(--color-background); color: var(--color-foreground); }
-
-@media (max-width: 560px) {
-  .nav-icon { width: 36px; height: 36px; }
-  .brand-bar { min-height: 44px; padding: 0 12px; }
+  --font-brand-japanese:
+    "Zen Maru Gothic", ui-sans-serif, system-ui, sans-serif;
 }
