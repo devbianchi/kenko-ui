@@ -1,32 +1,28 @@
 import { useSearchParams } from 'react-router'
 import { CountCard, MetricCard } from '../../../shared/components/DashboardCard'
-import { MonthPicker } from '../../../shared/components/MonthPicker'
-import { AppHeader } from '../../../shared/layout/AppHeader'
+import { MonthTransition } from '../../../shared/components/MonthTransition'
 import { UpcomingAppointments } from '../components/UpcomingAppointments'
 import { durationDifference, formatDay, formatDuration, homeData, readHomeMonth } from '../data/home'
 import type { HomeData } from '../data/home'
 
 export function HomePage({ data = homeData }: { data?: HomeData }) {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const month = readHomeMonth(searchParams.get('month'))
-  const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: 'UTC' })
-    .format(new Date(`${month}-15T12:00:00Z`))
   const { bestDay, peakHour, bestRoom } = data
 
   return (
-    <div className="[--spacing:0.25em] text-sm min-[1000px]:text-[clamp(12px,1.035vw,18px)]">
-      <AppHeader actions={<MonthPicker value={month} onChange={value => {
-        setSearchParams(previous => {
-          const next = new URLSearchParams(previous)
-          next.set('month', value)
-          return next
-        })
-      }} />} />
+    <div>
       <div className="mt-8 grid grid-cols-1 gap-5 min-[1000px]:grid-cols-[var(--spacing-sidebar)_minmax(0,1fr)]">
         <aside className="grid grid-cols-2 gap-2 sm:grid-cols-4 min-[1000px]:flex min-[1000px]:flex-col" aria-label="Resumo mensal de consultas">
-          <div className="flex min-h-status-card flex-col items-center justify-center rounded-card bg-primary text-background" aria-label={`Mês selecionado: ${month}`}>
-            <span className="text-month leading-[.85] font-semibold capitalize">{monthName}</span><span className="text-month leading-[.85] font-semibold">{month.slice(0, 4)}</span>
-          </div>
+          <MonthTransition value={month}>
+            {displayedMonth => {
+              const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: 'UTC' })
+                .format(new Date(`${displayedMonth}-15T12:00:00Z`))
+              return <div className="flex min-h-status-card flex-col items-center justify-center rounded-card bg-primary text-background" aria-label={`Mês selecionado: ${displayedMonth}`}>
+                <span className="text-month leading-[.85] font-semibold capitalize">{monthName}</span><span className="text-month leading-[.85] font-semibold">{displayedMonth.slice(0, 4)}</span>
+              </div>
+            }}
+          </MonthTransition>
           <CountCard label="Completas" value={data.appointments.complete} tone="dark" />
           <CountCard label="Pendentes" value={data.appointments.pending} />
           <CountCard label="Canceladas" value={data.appointments.cancelled} />

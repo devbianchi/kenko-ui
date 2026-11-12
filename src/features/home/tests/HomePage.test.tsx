@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { AppLayout } from '../../../shared/layout/AppLayout'
 import { HomePage } from '../pages/HomePage'
 import { homeData } from '../data/home'
 import type { HomeData, UpcomingAppointment } from '../data/home'
@@ -14,9 +15,11 @@ afterEach(() => vi.useRealTimers())
 
 function renderHome(data: HomeData = structuredClone(homeData), route = '/home') {
   return render(<MemoryRouter initialEntries={[route]}><Routes>
-    <Route path="/home" element={<HomePage data={data} />} />
-    <Route path="/calendar/2026-11-10" element={<h1>Dia 10 de novembro</h1>} />
-    <Route path="/analytics" element={<h1>Indicadores de Analytics</h1>} />
+    <Route element={<AppLayout />}>
+      <Route path="/home" element={<HomePage data={data} />} />
+      <Route path="/calendar/2026-11-10" element={<h1>Dia 10 de novembro</h1>} />
+      <Route path="/analytics" element={<h1>Indicadores de Analytics</h1>} />
+    </Route>
   </Routes></MemoryRouter>)
 }
 
@@ -28,7 +31,9 @@ it('não publica rascunhos do ano e restaura campo, URL e dados ao voltar', asyn
     return <><HomePage /><output aria-label="URL atual">{location.search}</output>
       <button onClick={() => navigate(-1)}>Voltar</button></>
   }
-  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo&view=cards']}><Example /></MemoryRouter>)
+  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo&view=cards']}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<Example />} /></Route>
+  </Routes></MemoryRouter>)
   await user.click(screen.getByLabelText('Mês e ano'))
   const year = screen.getByRole('spinbutton', { name: 'Ano' })
   await user.clear(year)
@@ -36,22 +41,20 @@ it('não publica rascunhos do ano e restaura campo, URL e dados ao voltar', asyn
   await user.type(year, '202')
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo&view=cards')
   expect(screen.getByLabelText('Mês selecionado: 2026-11')).toBeVisible()
-  await user.type(year, '3')
-  await user.tab()
-  expect(year).toHaveValue(2026)
-  expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo&view=cards')
+  expect(screen.getByRole('button', { name: 'Aplicar' })).toBeDisabled()
+  expect(screen.getByRole('alert')).toHaveTextContent('Data inválida')
   await user.clear(year)
   await user.type(year, '2025')
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo&view=cards')
-  await user.tab()
+  await user.click(screen.getByRole('button', { name: 'Aplicar' }))
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2025-11&origin=demo&view=cards')
-  expect(screen.getByLabelText('Mês selecionado: 2025-11')).toBeVisible()
+  await screen.findByLabelText('Mês selecionado: 2025-11')
   expect(screen.getByRole('article', { name: 'Completas' })).toHaveTextContent('10')
   expect(screen.getByRole('article', { name: 'Consulta de Ana' })).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Voltar' }))
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo&view=cards')
-  expect(year).toHaveValue(2026)
-  expect(screen.getByLabelText('Mês selecionado: 2026-11')).toBeVisible()
+  expect(screen.getByRole('spinbutton', { name: 'Ano' })).toHaveValue(2026)
+  await screen.findByLabelText('Mês selecionado: 2026-11')
   expect(screen.getByRole('article', { name: 'Consulta de Ana' })).toBeVisible()
 })
 
@@ -86,9 +89,13 @@ it('grava o mês na URL, preserva outros parâmetros e restaura o período ao vo
     return <><HomePage /><output aria-label="URL atual">{location.search}</output>
       <button onClick={() => navigate(-1)}>Voltar</button></>
   }
-  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo']}><Example /></MemoryRouter>)
+  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo']}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<Example />} /></Route>
+  </Routes></MemoryRouter>)
   await user.click(screen.getByLabelText('Mês e ano'))
   await user.selectOptions(screen.getByRole('combobox', { name: 'Mês' }), '10')
+  expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo')
+  await user.click(screen.getByRole('button', { name: 'Aplicar' }))
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-10&origin=demo')
   await user.click(screen.getByRole('button', { name: 'Voltar' }))
   expect(screen.getByLabelText('Mês selecionado: 2026-11')).toBeVisible()
@@ -118,15 +125,17 @@ it('altera o período visual e mantém os dados do mock', async () => {
   await user.click(screen.getByLabelText('Mês e ano'))
   await user.selectOptions(screen.getByRole('combobox', { name: 'Mês' }), '02')
   fireEvent.change(screen.getByRole('spinbutton', { name: 'Ano' }), { target: { value: '2025' } })
-  fireEvent.blur(screen.getByRole('spinbutton', { name: 'Ano' }))
-  expect(screen.getByLabelText('Mês selecionado: 2025-02')).toHaveTextContent('fev.2025')
-  expect(screen.getByLabelText('Mês e ano')).toHaveTextContent('Fevereiro')
+  await user.click(screen.getByRole('button', { name: 'Aplicar' }))
+  expect(await screen.findByLabelText('Mês selecionado: 2025-02')).toHaveTextContent('fev.2025')
+  expect(screen.getByLabelText('Mês e ano')).toHaveTextContent('Fevereiro 2025')
   expect(screen.queryByRole('status')).not.toBeInTheDocument()
   expect(screen.getByRole('article', { name: 'Completas' })).toHaveTextContent('10')
   expect(screen.getByRole('link', { name: 'Melhor Dia' })).toHaveTextContent('10/11')
   expect(screen.getByRole('article', { name: 'Consulta de Ana' })).toBeVisible()
+  await user.click(screen.getByLabelText('Mês e ano'))
   await user.selectOptions(screen.getByRole('combobox', { name: 'Mês' }), '11')
-  expect(screen.getByLabelText('Mês selecionado: 2025-11')).toHaveTextContent('nov.2025')
+  await user.click(screen.getByRole('button', { name: 'Aplicar' }))
+  expect(await screen.findByLabelText('Mês selecionado: 2025-11')).toHaveTextContent('nov.2025')
 })
 
 it.each(['2026-13', 'invalid', '0000-01'])('ignora mês inválido na URL: %s', month => {
@@ -140,6 +149,37 @@ it.each(['2026-12', '2027-01'])('limita período futuro da URL ao mês atual: %s
   expect(screen.getByLabelText('Mês e ano')).toHaveTextContent('Novembro')
   expect(screen.getByLabelText('Mês selecionado: 2026-11')).toHaveTextContent('nov.2026')
   expect(screen.getByRole('article', { name: 'Completas' })).toHaveTextContent('10')
+})
+
+it.each([
+  ['2020-01', '2024-01'],
+  ['2026-13', '2026-11'],
+  ['wrong', '2026-11'],
+])('normaliza mês da URL %s para %s e preserva parâmetros restantes', async (invalidMonth, expectedMonth) => {
+  function CurrentPage() {
+    const location = useLocation()
+    return <><HomePage /><output aria-label="URL atual">{location.search}</output></>
+  }
+  render(<MemoryRouter initialEntries={[`/home?month=${invalidMonth}&origin=demo`]}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<CurrentPage />} /></Route>
+  </Routes></MemoryRouter>)
+  await vi.waitFor(() => expect(screen.getByLabelText('URL atual')).toHaveTextContent(`?month=${expectedMonth}&origin=demo`))
+})
+
+it('substitui o mês inválido sem adicionar uma entrada ao histórico', async () => {
+  const user = userEvent.setup()
+  function CurrentPage() {
+    const location = useLocation()
+    const navigate = useNavigate()
+    return <><HomePage /><output aria-label="URL atual">{location.search}</output>
+      <button onClick={() => navigate(-1)}>Voltar</button></>
+  }
+  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo', '/home?month=2020-01&origin=demo']}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<CurrentPage />} /></Route>
+  </Routes></MemoryRouter>)
+  await vi.waitFor(() => expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2024-01&origin=demo'))
+  await user.click(screen.getByRole('button', { name: 'Voltar' }))
+  expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo')
 })
 
 it.each([
