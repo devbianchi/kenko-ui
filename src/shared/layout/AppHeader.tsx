@@ -11,7 +11,7 @@ export function AppHeader({ showcase = false }: { showcase?: boolean }) {
   return (
     <header className="flex items-center gap-4">
       {!showcase && (
-        <nav aria-label="Navegação principal" className="flex shrink-0 items-center gap-1 rounded-full bg-ink p-2">
+        <nav aria-label="Navegação principal" className="flex shrink-0 items-center gap-1 rounded-full bg-foreground p-2">
           {links.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
@@ -30,8 +30,8 @@ export function AppHeader({ showcase = false }: { showcase?: boolean }) {
         </nav>
       )}
       <Link to="/home" className="brand-bar" aria-label="Kenko, página inicial">
-        <span className="font-serif text-[25px] tracking-[0.06em]">KENKO</span>
-        <span className="text-[19px] tracking-[0.12em]" lang="ja">ケンコ</span>
+        <span className="brand-wordmark font-brand text-[25px] tracking-[0.06em]">KENKO</span>
+        <span className="font-brand-japanese text-[19px] tracking-[0.12em]" lang="ja">ケンコ</span>
       </Link>
     </header>
   )
