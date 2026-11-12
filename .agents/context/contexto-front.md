@@ -34,7 +34,7 @@ A entrega atual é um protótipo funcional com dados estáticos. Implementar e t
 
 ## 2. Base técnica e limites
 
-A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Lucide React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. As páginas ainda são placeholders, sem integração de negócio. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
+A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. A Home apresenta um protótipo com mocks e filtro mensal; as demais páginas ainda são placeholders, sem integração de negócio. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
 
 Biblioteca de gráficos, formulários, estado/cache, hospedagem e organização adicional continuam decisões de implementação, conforme a tarefa. Lint ainda não está configurado; quando solicitado pelas skills, registrar essa limitação sem alegar execução. A infraestrutura de testes está descrita abaixo.
 
@@ -91,6 +91,12 @@ Totais, rankings e distribuições incluem canceladas; ocupação exclui reserva
 Painel: Home, Analytics e Calendário; Dia pertence ao Calendário. Showcase é separado. O ícone de saída pode ser removido ou levar ao Showcase, sem logout. Links exigidos: data no Calendário → Dia; Melhor Dia → Dia correspondente; duração da Home → Analytics. Remover outros ícones sem destino definido, sem criar telas novas.
 
 ### Home — TELA-01, RF-11
+
+Decisão visual aprovada para o protótipo: o filtro muda o mês/ano na URL, no seletor e no card azul, mantendo os indicadores estáticos do mock. A faixa histórica inclusiva vai de janeiro de 2024 ao mês atual em America/Sao_Paulo. Todos os meses de 2024 e dos anos posteriores já encerrados são permitidos. Desabilitar meses futuros e rejeitar a confirmação de anos anteriores a 2024, anos futuros ou entradas inválidas. URLs com período bem formado abaixo de 2024-01 exibem 2024-01; acima do mês atual exibem o mês atual. Parâmetros malformados preservam o fallback existente do mock, limitado à faixa permitida.
+
+O ano possui rascunho local: limpar e digitar não publica valores intermediários na URL nem altera o período confirmado. Tab, perda de foco ou Enter concluem a edição; entrada válida confirma uma única mudança, enquanto vazio/parcial/inválido restaura o ano confirmado sem chamar onChange. Escape mantém fechamento e retorno de foco ao seletor, concluindo a edição pela perda de foco. Ao mudar de dezembro de um ano anterior para o ano atual, limitar ao mês atual se necessário. Mudanças externas do período, inclusive Voltar, sincronizam o campo. Preservar os demais parâmetros da URL; próximas consultas continuam independentes do filtro.
+
+Os cards de próximas consultas exibem somente horário, sala, paciente e especialidade, conforme o PNG; médico e data permanecem nos dados, sem exibição adicional. Essa apresentação substitui a versão anterior do protótipo; as regras de integração futura abaixo permanecem como referência.
 
 Filtro próprio de mês/ano, sem modos semana/ano. Exibir completas, pendentes, canceladas, melhor dia, hora de pico, melhor sala, mediana de atendimento e variação. Rankings sem consultas são null, sem inventar vencedores. O título de duração deve dizer mediana, não média.
 

@@ -1,6 +1,10 @@
 # Kenko UI
 
-Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. A aplicação é organizada por feature e usa páginas placeholder nesta etapa. Não há integração com API nem comportamento de negócio implementado.
+Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. A aplicação é organizada por feature. A Home apresenta o protótipo com mocks; as demais páginas ainda são placeholders. Não há integração com API.
+
+A Home usa o resumo de novembro de 2026 em `mocks/home/home.ts`. O filtro mensal é mantido na URL (`/home?month=2026-11`); a seleção permite períodos de janeiro de 2024 até o mês atual em Brasília e muda apenas a apresentação do período e preserva os indicadores estáticos do mock. Próximas consultas usam o relógio real de Brasília: o exemplo de 20/11/2026 deixa de aparecer após seu início. Cards compartilhados, responsividade e movimento reduzido estão implementados; os cards laterais permanecem estáticos. A apresentação usa utilitários Tailwind, com tokens em `src/styles.css`, dimensões fluidas no desktop e escalas suaves de 1,02 no hover e retorno a 1 ao pressionar.
+
+O campo de ano permite apagar e redigitar: Tab, perda de foco ou Enter confirmam um ano válido; entradas inválidas restauram o ano anterior. Rascunhos não alteram a URL. O botão Voltar restaura o período e os demais parâmetros da URL são preservados.
 
 ## Páginas e rotas
 

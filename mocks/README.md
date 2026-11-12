@@ -2,7 +2,7 @@
 
 Fixtures visuais simplificados para composição das telas. Não representam contratos completos da API nem valores fixos de aceitação. Os tipos exportados derivam das constantes (typeof/as const): descrevem esses exemplos, não os tipos gerais da integração.
 
-Origem: exemplos da [API, §4](../.agents/context/completo/kenko-backend-api.md#4-exemplos-json) e do [bot, §5–6](../.agents/context/completo/kenko-bot-api.md#5-exemplos-json-caminho-completo-de-agendamento). Campos mantidos preservam nomes e valores dos exemplos. Na integração, consultar o contrato da operação e as regras do [contexto](../.agents/context/contexto-front.md).
+Origem: exemplos da [API, §4](../.agents/context/completo/kenko-backend-api.md#4-exemplos-json) e do [bot, §5–6](../.agents/context/completo/kenko-bot-api.md#5-exemplos-json-caminho-completo-de-agendamento). Campos mantidos preservam nomes e valores dos exemplos, exceto os ajustes visuais autorizados: clínica chamada “Clínica” e consulta da Home em 20/11/2026 às 13h. Na integração, consultar o contrato da operação e as regras do [contexto](../.agents/context/contexto-front.md).
 
 ## Catálogo
 

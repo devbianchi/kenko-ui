@@ -4,6 +4,16 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { expect, it } from 'vitest'
 import { AppHeader } from '../AppHeader'
 
+it.each([false, true])('mantém a marca acessível no cabeçalho com showcase=%s', showcase => {
+  render(<MemoryRouter><AppHeader showcase={showcase} /></MemoryRouter>)
+  const brand = screen.getByRole('link', { name: 'Kenko, página inicial' })
+  expect(brand).toHaveTextContent('KENKO')
+  expect(brand).toHaveTextContent('ケンコ')
+  expect(brand).toHaveAttribute('href', '/home')
+  if (showcase) expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  else expect(screen.getByRole('navigation', { name: 'Navegação principal' })).toBeVisible()
+})
+
 it('navega para Analytics e atualiza o link ativo após o clique', async () => {
   const user = userEvent.setup()
 
