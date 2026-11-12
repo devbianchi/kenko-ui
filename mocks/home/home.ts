@@ -1,5 +1,6 @@
 import { clinicaMock } from '../shared/clinica';
 
+// Fixture visual: consulta atualizada para 20/11/2026 a pedido do usuário.
 // Exemplo extraído de .agents/context/completo/kenko-backend-api.md: 4.2 Home — GET /api/dashboard?month=2026-11
 export const homeMock = {
   "data": {
@@ -35,8 +36,8 @@ export const homeMock = {
       {
         "id": "ap_90",
         "status": "pending",
-        "startsAt": "2026-11-10T13:00:00-03:00",
-        "endsAt": "2026-11-10T13:30:00-03:00",
+        "startsAt": "2026-11-20T13:00:00-03:00",
+        "endsAt": "2026-11-20T13:30:00-03:00",
         "patient": {
           "id": "pt_20",
           "name": "Ana"
