@@ -114,6 +114,8 @@ Dimensões do protótipo: cards seguem aproximadamente a proporção 3:2 do desi
 
 Sem filtro próprio. Exibir total/status, taxa de completude, consultas por hora, manhã/tarde e tabela por sala: consultas, canceladas entre parênteses, ocupação e pico. Manhã é antes de 12h; tarde é a partir de 12h. Incluir salas cadastradas sem consultas; ocupação sem capacidade é “—”. Não omitir horas cadastradas porque o PNG ilustra 9h–20h. Não há pacientes por sala ou tela extra de detalhe.
 
+Apresentação do Dia: cabeçalho da tabela de salas com degradê contínuo e cantos arredondados. O card da tabela e seu cabeçalho permanecem estáticos; somente linhas de dados recebem hover de escala, sem sombras, respeitando movimento reduzido. Barras horárias mostram popup customizado com horário e contagem exata no hover ou foco, inclusive zero, sem tooltip nativo. O popup acompanha o cursor imediatamente acima dele; por teclado, aparece acima da barra. Saída, perda de foco e Escape fecham o popup. Entrada e saída usam fade de 150ms, desativado sob movimento reduzido.
+
 ### Analytics — TELA-04, RF-14
 
 Filtro semana/mês/ano governa cinco KPIs e seis gráficos definidos em §6. Não permitir ano futuro. Não há filtros por paciente/médico/sala, exportação, exploração de pessoas por barra ou construtor de relatórios.

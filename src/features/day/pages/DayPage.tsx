@@ -54,12 +54,12 @@ export function DayPage({ data = diaMock.data }: { data?: DayData }) {
           </DashboardCard>
         </div>
 
-        <DashboardCard label="Informações por sala" className="p-4">
+        <DashboardCard label="Informações por sala" motion={false} className="p-4">
           <h2 className="mb-2 font-heading text-section font-semibold">Informações por sala</h2>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto p-2">
             <table className="w-full min-w-[34rem] border-separate border-spacing-y-1 text-center text-body">
               <thead>
-                <tr className="bg-brand text-foreground">
+                <tr className="bg-brand text-foreground [clip-path:inset(0_round_var(--radius-lg))]">
                   <th scope="col" className="rounded-l-lg border-y border-l border-border px-2 py-2 font-semibold">Sala</th>
                   <th scope="col" className="border-y border-border px-2 py-2 font-semibold">Consultas (Canceladas)</th>
                   <th scope="col" className="border-y border-border px-2 py-2 font-semibold">Ocupação</th>
@@ -68,7 +68,7 @@ export function DayPage({ data = diaMock.data }: { data?: DayData }) {
               </thead>
               <tbody>
                 {rooms.map(room => (
-                  <tr key={room.id}>
+                  <tr key={room.id} className="rounded-lg bg-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:scale-102 motion-safe:active:scale-100 motion-reduce:transition-none">
                     <th scope="row" className="rounded-l-lg border-y border-l border-border px-2 py-2 font-medium">{room.name}</th>
                     <td className="border-y border-border px-2 py-2">{room.appointmentCount}{room.cancelledCount ? ` (${room.cancelledCount})` : ''}</td>
                     <td className="border-y border-border px-2 py-2">{formatOccupancy(room.occupiedSlots, room.totalSlots)}</td>
