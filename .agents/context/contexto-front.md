@@ -108,6 +108,8 @@ Grade mensal de domingo a sábado. O frontend escolhe as datas visíveis, inclui
 
 Destacar hoje; esmaecer somente dias fora do mês, não os futuros do próprio mês. Datas adjacentes representam suas datas reais. Selecionar data abre Dia. Exemplo: grade 27/09–31/10 envia 27/09 e 01/11 como fim exclusivo.
 
+Dimensões do protótipo: cards seguem aproximadamente a proporção 3:2 do design no desktop, com altura mínima para proteger o conteúdo em telas estreitas. A grade cresce conforme o número de semanas, sem dividir uma altura fixa da janela. O limite de largura do layout contém o crescimento em zoom reduzido; rolagem vertical é permitida quando necessária.
+
 ### Dia — TELA-03, RF-13
 
 Sem filtro próprio. Exibir total/status, taxa de completude, consultas por hora, manhã/tarde e tabela por sala: consultas, canceladas entre parênteses, ocupação e pico. Manhã é antes de 12h; tarde é a partir de 12h. Incluir salas cadastradas sem consultas; ocupação sem capacidade é “—”. Não omitir horas cadastradas porque o PNG ilustra 9h–20h. Não há pacientes por sala ou tela extra de detalhe.
