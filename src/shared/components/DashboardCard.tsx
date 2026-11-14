@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router";
 
-type Tone = "light" | "dark" | "primary";
+type Tone = "light" | "dark" | "primary" | "cancelled";
 const tones = {
   light: "bg-background text-foreground",
   dark: "bg-foreground text-background",
   primary: "bg-primary text-background",
+  cancelled: "bg-day-cancelled text-foreground",
 };
 
 type DashboardCardProps = {
@@ -45,10 +46,12 @@ export function CountCard({
   label,
   value,
   tone = "light",
+  suffix = "",
 }: {
   label: string;
   value: number | null;
   tone?: Tone;
+  suffix?: string;
 }) {
   return (
     <DashboardCard
@@ -58,9 +61,7 @@ export function CountCard({
       motion={false}
     >
       <h2 className="text-body font-bold">{label}</h2>
-      <p className="text-count leading-none font-semibold">
-        {value ?? "—"}
-      </p>
+      <p className="text-count leading-none font-semibold">{value === null ? "—" : `${value}${suffix}`}</p>
     </DashboardCard>
   );
 }
