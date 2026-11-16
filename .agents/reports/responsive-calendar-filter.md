@@ -1,5 +1,7 @@
 ## Responsividade e filtro mensal
 
+> Histórico desta etapa: o dimensionamento B9 e suas referências a altura de viewport foram substituídos por [calendar-card-sizing.md](calendar-card-sizing.md). Os checks abaixo registram o estado daquela execução, não a suíte atual após a implementação de Dia.
+
 Status: 10/10 IDs done. Blocked / not done: nenhum.
 
 ### Behavior map

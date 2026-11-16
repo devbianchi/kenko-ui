@@ -34,7 +34,7 @@ A entrega atual é um protótipo funcional com dados estáticos. Implementar e t
 
 ## 2. Base técnica e limites
 
-A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. A Home apresenta um protótipo com mocks e filtro mensal; as demais páginas ainda são placeholders, sem integração de negócio. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
+A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. Home, Calendário e Dia apresentam protótipos com mocks; Home e Calendário compartilham o filtro mensal. Analytics e Showcase ainda são placeholders. Nenhuma página está integrada à API. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
 
 Biblioteca de gráficos, formulários, estado/cache, hospedagem e organização adicional continuam decisões de implementação, conforme a tarefa. Lint ainda não está configurado; quando solicitado pelas skills, registrar essa limitação sem alegar execução. A infraestrutura de testes está descrita abaixo.
 
@@ -94,7 +94,7 @@ Painel: Home, Analytics e Calendário; Dia pertence ao Calendário. Showcase é 
 
 Decisão visual aprovada para o protótipo: o filtro muda o mês/ano na URL, no seletor e no card azul, mantendo os indicadores estáticos do mock. A faixa histórica inclusiva vai de janeiro de 2024 ao mês atual em America/Sao_Paulo. Todos os meses de 2024 e dos anos posteriores já encerrados são permitidos. Desabilitar meses futuros e rejeitar a confirmação de anos anteriores a 2024, anos futuros ou entradas inválidas. URLs com período bem formado abaixo de 2024-01 exibem 2024-01; acima do mês atual exibem o mês atual. Parâmetros malformados preservam o fallback existente do mock, limitado à faixa permitida.
 
-O ano possui rascunho local: limpar e digitar não publica valores intermediários na URL nem altera o período confirmado. Tab, perda de foco ou Enter concluem a edição; entrada válida confirma uma única mudança, enquanto vazio/parcial/inválido restaura o ano confirmado sem chamar onChange. Escape mantém fechamento e retorno de foco ao seletor, concluindo a edição pela perda de foco. Ao mudar de dezembro de um ano anterior para o ano atual, limitar ao mês atual se necessário. Mudanças externas do período, inclusive Voltar, sincronizam o campo. Preservar os demais parâmetros da URL; próximas consultas continuam independentes do filtro.
+Home e Calendário compartilham o formulário de período. Mês e ano ficam em rascunho até o envio por Aplicar. Tab e perda de foco mantêm a edição local. Ao enviar um período válido diferente do atual, a URL muda uma vez e preserva os demais parâmetros. Valor incompleto ou fora da faixa exibe alerta e bloqueia Aplicar. Ao mudar de dezembro de um ano anterior para o ano atual, se dezembro estiver no futuro, selecionar um mês válido para aplicar. Escape descarta o rascunho, fecha o seletor e devolve o foco ao controle de abertura. Mudanças externas do período, inclusive Voltar, sincronizam os campos. As próximas consultas da Home continuam independentes do filtro.
 
 Os cards de próximas consultas exibem somente horário, sala, paciente e especialidade, conforme o PNG; médico e data permanecem nos dados, sem exibição adicional. Essa apresentação substitui a versão anterior do protótipo; as regras de integração futura abaixo permanecem como referência.
 
@@ -111,6 +111,8 @@ Destacar hoje; esmaecer somente dias fora do mês, não os futuros do próprio m
 Dimensões do protótipo: cards seguem aproximadamente a proporção 3:2 do design no desktop, com altura mínima para proteger o conteúdo em telas estreitas. A grade cresce conforme o número de semanas, sem dividir uma altura fixa da janela. O limite de largura do layout contém o crescimento em zoom reduzido; rolagem vertical é permitida quando necessária.
 
 ### Dia — TELA-03, RF-13
+
+Decisões do protótipo confirmadas pelo usuário durante a revisão de Calendário/Dia: reutilizar o mesmo `diaMock` para todas as datas, alterando apenas a data do título; a igualdade entre totais do Calendário e Dia por data fica para a integração. O gráfico horário apresenta somente o expediente básico de 07h a 17h (início incluído, fechamento às 18h excluído). Esse recorte é intencional e substitui, nesta etapa, a exigência de exibir todas as horas recebidas descrita abaixo. A integração futura deve usar os dados e o expediente efetivos da clínica.
 
 Sem filtro próprio. Exibir total/status, taxa de completude, consultas por hora, manhã/tarde e tabela por sala: consultas, canceladas entre parênteses, ocupação e pico. Manhã é antes de 12h; tarde é a partir de 12h. Incluir salas cadastradas sem consultas; ocupação sem capacidade é “—”. Não omitir horas cadastradas porque o PNG ilustra 9h–20h. Não há pacientes por sala ou tela extra de detalhe.
 
@@ -168,7 +170,7 @@ Usar America/Sao_Paulo para negócio e apresentação. Intervalos incluem iníci
 
 Filtros de Analytics: semana = sete datas terminando na referência; mês = mês indicado; ano corrente = janeiro até fim do mês atual, anteriores = doze meses. Não permitir ano futuro. Capacidade futura dentro do período entra na ocupação. Comparação usa período imediatamente anterior de mesma duração, não necessariamente mês de calendário.
 
-Percentuais 0–100, exibidos com uma casa decimal; contagens inteiras; durações em minutos/segundos. Preservar precisão até apresentação. Zero é valor válido; estatística sem base é null (“—”), nunca zero artificial. Coleções vazias são válidas. Variação usa pontos percentuais, segundos ou contagem absoluta conforme a unidade. Usar melhoria/piora somente quando houver sentido favorável definido; aumento fora do expediente não tem interpretação favorável presumida. Tratamento específico de difference null será definido posteriormente; não inferir diferença ou base de comparação no cliente.
+Percentuais 0–100, exibidos com uma casa decimal, exceto na página Dia, que arredonda completude e ocupação ao inteiro mais próximo; contagens inteiras; durações em minutos/segundos. Preservar precisão até apresentação. Zero é valor válido; estatística sem base é null (“—”), nunca zero artificial. Coleções vazias são válidas. Variação usa pontos percentuais, segundos ou contagem absoluta conforme a unidade. Usar melhoria/piora somente quando houver sentido favorável definido; aumento fora do expediente não tem interpretação favorável presumida. Tratamento específico de difference null será definido posteriormente; não inferir diferença ou base de comparação no cliente.
 
 Empates em rankings: data/hora mais cedo ou menor número de sala. Mesmos dados/filtros/instante explicam resultados; indicadores dependentes do relógio podem mudar sem novos registros.
 
@@ -269,7 +271,7 @@ Selecione os critérios afetados, sem transformar toda tarefa em teste integral 
 | VAL-34 | Iniciar exatamente na abertura/fechamento. | 07h dentro e 18h fora nos dias úteis; 09h dentro e 13h fora no sábado, usando America/Sao_Paulo. |
 | VAL-35 | Conferir série e média móvel. | Blocos mensais pelas datas definidas; média dos três últimos pontos calculáveis dentro da janela, sem converter ausência de base em zero. |
 | VAL-36 | Conferir histograma/P90. | Duração de dez minutos entra em “10+”, não na barra 10; com dez amostras, P90 é a nona menor duração. |
-| VAL-37 | Conferir ausência de dados e arredondamento. | Contagens vazias são zero; estatísticas sem base são “—”; percentuais exibidos com uma casa decimal, sem arredondar antes do cálculo. |
+| VAL-37 | Conferir ausência de dados e arredondamento. | Contagens vazias são zero; estatísticas sem base são “—”; percentuais arredondados na apresentação conforme §6 (inteiros para completude e ocupação do Dia). |
 | VAL-38 | Exibir calendário com cinco ou seis linhas. | Frontend envia o intervalo visível; API retorna contagens sem determinar o layout ou devolver limites de grade. |
 | VAL-39 | Recarregar chat ou dashboards por GET. | Nenhum avanço, nova busca, mensagem ou renovação de atividade; abandono continua ocorrendo. |
 | VAL-40 | Reenviar uma interação após falha de rede. | Mesma actionId não duplica reserva ou busca; ação com revisão antiga não avança estado indevidamente. |

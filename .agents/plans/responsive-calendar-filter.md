@@ -1,5 +1,7 @@
 # Responsividade e filtro mensal — ledger
 
+> B9 foi substituído pelo plano [calendar-card-sizing.md](calendar-card-sizing.md): altura natural e rolagem permitida. Manter este registro como histórico, sem usar a regra antiga de altura para novas alterações.
+
 Objetivo: padronizar o cabeçalho pela escala da Home e tornar o filtro de mês/ano explícito, validado e animado na Home e no Calendário.
 
 | ID | Comportamento observável | Origem | Verificação prevista |
