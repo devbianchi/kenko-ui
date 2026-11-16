@@ -1,6 +1,6 @@
 # Kenko UI
 
-Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. Home, Calendário e Dia usam mocks locais. Analytics ainda é um placeholder. O Showcase permite criar, selecionar e apagar conversas locais. A lista mostra “1m”, a mensagem inicial mostra “16:50” e as opções do bot são demonstrativas. A integração com a API está prevista para uma etapa posterior.
+Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. Home, Calendário, Dia e Analytics usam mocks locais. O Showcase permite criar, selecionar e apagar conversas locais. A lista mostra “1m”, a mensagem inicial mostra “16:50” e as opções do bot são demonstrativas. A integração com a API está prevista para uma etapa posterior.
 
 A Home usa o resumo de novembro de 2026 em `mocks/home/home.ts`. O filtro mensal é mantido na URL (`/home?month=2026-11`); a seleção permite períodos de janeiro de 2024 até o mês atual em Brasília e muda apenas a apresentação do período e preserva os indicadores estáticos do mock. Próximas consultas usam o relógio real de Brasília: o exemplo de 20/11/2026 deixa de aparecer após seu início. Cards compartilhados, responsividade e movimento reduzido estão implementados; os cards laterais permanecem estáticos. A apresentação usa utilitários Tailwind, com tokens em `src/styles.css`, dimensões fluidas no desktop e escalas suaves de 1,02 no hover e retorno a 1 ao pressionar.
 
@@ -9,6 +9,8 @@ Home e Calendário compartilham o filtro mensal. Mês e ano ficam em rascunho at
 No Calendário, cada data abre a página Dia. Durante o protótipo, o título acompanha a data selecionada e o resumo usa a mesma fixture. O gráfico horário apresenta as horas de início de 07h a 17h. Completude e ocupação são arredondadas ao inteiro mais próximo. Quando falta base para o cálculo, a página mostra “—”.
 
 ## Páginas e rotas
+
+Analytics abre em outubro de 2026. O filtro do cabeçalho usa `period` e `reference` na URL. Todos os meses usam os mesmos cinco indicadores e seis gráficos de `mocks/analytics/analytics.ts`, com os blocos da série limitados ao último dia do mês escolhido. Os percentuais dos cards são arredondados ao inteiro mais próximo. Semana e ano exibem um aviso de indisponibilidade porque o mock contém apenas agregados mensais.
 
 | Rota | Página |
 | --- | --- |
