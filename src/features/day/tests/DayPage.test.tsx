@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, expect, it, vi } from 'vitest'
+import { CalendarPage } from '../../calendar/pages/CalendarPage'
 import { DayPage } from '../pages/DayPage'
 import type { DayData } from '../pages/DayPage'
 import { diaMock } from '../../../../mocks/day/dia'
@@ -9,7 +10,7 @@ import { diaMock } from '../../../../mocks/day/dia'
 function renderDay(route = '/calendar/2026-11-10', data: DayData = diaMock.data) {
   return render(<MemoryRouter initialEntries={[route]}><Routes>
     <Route path="/calendar/:date" element={<DayPage data={data} />} />
-    <Route path="/calendar" element={<DayPage data={data} />} />
+    <Route path="/calendar" element={<CalendarPage />} />
   </Routes></MemoryRouter>)
 }
 
@@ -32,10 +33,8 @@ it('expõe resumo, gráficos e tabela em regiões acessíveis', () => {
   const navigation = screen.getByRole('group', { name: 'Navegação entre dias' })
   const previousButton = within(navigation).getByRole('button', { name: 'Dia anterior' })
   const nextButton = within(navigation).getByRole('button', { name: 'Próximo dia' })
-  expect(previousButton.nextElementSibling).toBe(nextButton)
-  expect(nextButton.nextElementSibling).toBe(screen.getByRole('heading', { name: '10 de Novembro' }))
-  expect(previousButton).toHaveClass('hover:opacity-70')
-  expect(nextButton).toHaveClass('hover:opacity-70')
+  expect(previousButton).toBeEnabled()
+  expect(nextButton).toBeEnabled()
   expect(screen.getByRole('img', { name: 'Consultas por horário, 11 horários' })).toBeVisible()
   expect(screen.getByRole('img', { name: 'Manhã: 3; Tarde: 1' })).toBeVisible()
   const table = screen.getByRole('table')
@@ -52,14 +51,21 @@ it('inclui todas as salas e não calcula ocupação sem capacidade', () => {
   expect(row).toBeVisible()
 })
 
-it('usa um título simples quando a data está ausente ou inválida', () => {
-  renderDay('/calendar')
-  expect(screen.getByRole('heading', { name: 'Data não disponível' })).toBeVisible()
-  expect(screen.getByRole('button', { name: 'Dia anterior' })).toBeDisabled()
-  expect(screen.getByRole('button', { name: 'Próximo dia' })).toBeDisabled()
-  expect(screen.getByRole('button', { name: 'Dia anterior' })).toHaveClass('invisible')
-  expect(screen.getByRole('button', { name: 'Próximo dia' })).toHaveClass('invisible')
-  expect(screen.queryByLabelText('Avanço indisponível')).not.toBeInTheDocument()
+it('volta do erro ao calendário pelo link do cartão', async () => {
+  const user = userEvent.setup()
+  renderDay('/calendar/invalid')
+  await user.click(screen.getByRole('link', { name: 'Voltar ao Calendário' }))
+  expect(screen.getByRole('heading', { name: 'Calendário' })).toBeVisible()
+})
+
+it('apresenta as setas antes do título com o hover aprovado', () => {
+  renderDay()
+  const previousButton = screen.getByRole('button', { name: 'Dia anterior' })
+  const nextButton = screen.getByRole('button', { name: 'Próximo dia' })
+  expect(previousButton.nextElementSibling).toBe(nextButton)
+  expect(nextButton.nextElementSibling).toBe(screen.getByRole('heading', { name: '10 de Novembro' }))
+  expect(previousButton).toHaveClass('hover:opacity-70')
+  expect(nextButton).toHaveClass('hover:opacity-70')
 })
 
 it('avança e volta um dia sem alterar os dados mockados', async () => {
@@ -69,10 +75,19 @@ it('avança e volta um dia sem alterar os dados mockados', async () => {
   renderDay('/calendar/2026-11-10')
 
   await user.click(screen.getByRole('button', { name: 'Próximo dia' }))
-  expect(screen.getByRole('heading', { name: '10 de Novembro' }).closest('.transition-opacity')).toHaveClass('opacity-0')
+  const previous = screen.getByRole('button', { name: 'Dia anterior' })
+  const next = screen.getByRole('button', { name: 'Próximo dia' })
+  expect(previous).toBeDisabled()
+  expect(next).toBeDisabled()
   expect(await screen.findByRole('heading', { name: '11 de Novembro' })).toBeVisible()
   expect(screen.getByRole('article', { name: 'Total' })).toHaveTextContent('4')
-  await user.click(screen.getByRole('button', { name: 'Dia anterior' }))
+  expect(previous).toBeDisabled()
+  expect(next).toBeDisabled()
+  await user.click(next)
+  await waitFor(() => expect(previous).toBeEnabled())
+  expect(next).toBeEnabled()
+  expect(screen.getByRole('heading', { name: '11 de Novembro' })).toBeVisible()
+  await user.click(previous)
   expect(await screen.findByRole('heading', { name: '10 de Novembro' })).toBeVisible()
 })
 
@@ -100,16 +115,18 @@ it('oculta somente a seta que ultrapassaria os limites de meses válidos', () =>
   expect(screen.getByRole('button', { name: 'Dia anterior' })).toBeEnabled()
   expect(screen.getByRole('button', { name: 'Próximo dia' })).toHaveClass('invisible')
 
-  view.unmount()
-  renderDay('/calendar/2023-12-31')
-  expect(screen.getByRole('heading', { name: 'Data não disponível' })).toBeVisible()
-  expect(screen.getByRole('button', { name: 'Dia anterior' })).toHaveClass('invisible')
-  expect(screen.getByRole('button', { name: 'Próximo dia' })).toHaveClass('invisible')
 })
 
-it.each(['invalid', '2026-02-30', '2026-13-01'])('rejeita data inválida da rota: %s', date => {
+it.each(['invalid', '2026-02-30', '2026-13-01', '2023-12-31', '2026-12-01'])('rejeita data inválida da rota: %s', date => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-11-16T12:00:00-03:00'))
   renderDay(`/calendar/${date}`)
-  expect(screen.getByRole('heading', { name: 'Data não disponível' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: 'Data Inválida :/' })).toBeVisible()
+  expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  expect(screen.queryByRole('article')).not.toBeInTheDocument()
+  expect(screen.queryByRole('figure')).not.toBeInTheDocument()
+  expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  expect(screen.queryByRole('region', { name: 'Resumo de consultas do dia' })).not.toBeInTheDocument()
 })
 
 it('aceita o dia bissexto sem deslocar sua data', () => {
@@ -151,6 +168,6 @@ it('exibe zero percentual quando a base é positiva', () => {
     summary: { total: 1, complete: 0, pending: 0, cancelled: 1 },
     rooms: [{ ...diaMock.data.rooms[0], appointmentCount: 1, cancelledCount: 1, totalSlots: 3, occupiedSlots: 0 }],
   })
-  expect(screen.getByRole('article', { name: 'Taxa de Completude' })).toHaveTextContent('0%')
-  expect(screen.getByRole('row', { name: /Sala 1/ })).toHaveTextContent('0%')
+  expect(within(screen.getByRole('article', { name: 'Taxa de Completude' })).getByText('0%', { exact: true })).toBeVisible()
+  expect(within(screen.getByRole('row', { name: /Sala 1/ })).getByRole('cell', { name: '0%' })).toBeVisible()
 })

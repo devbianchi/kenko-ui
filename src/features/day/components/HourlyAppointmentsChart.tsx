@@ -1,17 +1,11 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-type HourlySeries = { hours: readonly number[]; counts: readonly number[] }
-
-function alignedPoints({ hours, counts }: HourlySeries) {
-  return hours.slice(0, Math.min(hours.length, counts.length)).map((hour, index) => ({
-    hour,
-    count: Math.max(0, counts[index] ?? 0),
-  }))
-}
+import { alignedPoints, type HourlySeries } from './hourlySeries'
 
 export function HourlyAppointmentsChart(series: HourlySeries) {
   const tooltipId = useId()
+  const pointerPress = useRef(false)
   const [tooltipVisible, setTooltipVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [position, setPosition] = useState({ left: 0, top: 0 })
@@ -59,8 +53,18 @@ export function HourlyAppointmentsChart(series: HourlySeries) {
                 onPointerMove={event => {
                   if (tooltipVisible) setPosition({ left: event.clientX, top: event.clientY })
                 }}
-                onPointerLeave={() => setTooltipVisible(false)}
+                onPointerLeave={() => { pointerPress.current = false; setTooltipVisible(false) }}
+                onPointerDown={event => {
+                  pointerPress.current = true
+                  showTooltip(index, event.clientX, event.clientY)
+                }}
+                onPointerUp={() => { pointerPress.current = false }}
+                onPointerCancel={() => { pointerPress.current = false }}
+                onClick={event => {
+                  if (event.detail > 0) showTooltip(index, event.clientX, event.clientY)
+                }}
                 onFocus={event => {
+                  if (pointerPress.current) return
                   const bounds = event.currentTarget.getBoundingClientRect()
                   showTooltip(index, bounds.left + bounds.width / 2, bounds.top)
                 }} onBlur={() => setTooltipVisible(false)}
@@ -73,33 +77,6 @@ export function HourlyAppointmentsChart(series: HourlySeries) {
         </div>
         </div>
       )}
-    </figure>
-  )
-}
-
-export function DayPeriodChart(series: HourlySeries) {
-  const totals = alignedPoints(series).reduce((periods, { hour, count }) => {
-    const key = hour < 12 ? 'morning' : 'afternoon'
-    periods[key] += count
-    return periods
-  }, { morning: 0, afternoon: 0 })
-  const maximum = Math.max(totals.morning, totals.afternoon)
-
-  return (
-    <figure aria-label="Resumo por período">
-      <figcaption className="mb-3 font-heading text-body font-semibold">Resumo por período</figcaption>
-      <div className="grid h-32 grid-cols-2 items-end gap-3" role="img" aria-label={`Manhã: ${totals.morning}; Tarde: ${totals.afternoon}`}>
-        {([
-          { label: 'Manhã', value: totals.morning, color: 'bg-tertiary' },
-          { label: 'Tarde', value: totals.afternoon, color: 'bg-secondary' },
-        ]).map(period => (
-          <div key={period.label} className="flex h-full flex-col items-center justify-end">
-            <span className="mb-1 text-label">{period.value}</span>
-            <div className={`w-full rounded-t-md ${period.color}`} style={{ height: maximum === 0 ? '0%' : `${period.value / maximum * 75}%` }} aria-hidden="true" />
-            <span className="mt-1">{period.label}</span>
-          </div>
-        ))}
-      </div>
     </figure>
   )
 }
