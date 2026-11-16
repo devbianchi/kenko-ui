@@ -2,7 +2,7 @@ import { calendarioMock } from '../../../../mocks/calendar/calendario'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
 
 export const calendarData = calendarioMock.data
-export const CALENDAR_FALLBACK_MONTH = calendarData.today.slice(0, 7)
+const CALENDAR_FALLBACK_MONTH = calendarData.today.slice(0, 7)
 
 export function readCalendarMonth(value: string | null) {
   const candidate = value && /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/.test(value)
