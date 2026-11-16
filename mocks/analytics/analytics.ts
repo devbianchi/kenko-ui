@@ -106,19 +106,19 @@ export const analyticsMock = {
           "label": "2",
           "fromInclusive": 60,
           "toExclusive": 120,
-          "count": 1
+          "count": 2
         },
         {
           "label": "3",
           "fromInclusive": 120,
           "toExclusive": 180,
-          "count": 1
+          "count": 3
         },
         {
           "label": "4",
           "fromInclusive": 180,
           "toExclusive": 240,
-          "count": 1
+          "count": 2
         },
         {
           "label": "5",

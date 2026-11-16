@@ -38,12 +38,6 @@ export function formatDay(date: string) {
   return new Intl.DateTimeFormat('pt-BR', { timeZone: businessTimeZone, day: '2-digit', month: '2-digit' }).format(new Date(`${date}T12:00:00-03:00`))
 }
 
-export function formatDuration(seconds: number | null) {
-  if (seconds === null) return '—'
-  const rounded = Math.round(seconds)
-  return `${Math.floor(rounded / 60)}m${String(rounded % 60).padStart(2, '0')}s`
-}
-
 export function durationDifference(seconds: number | null) {
   if (seconds === null) return 'Sem comparação com o mês anterior'
   if (seconds === 0) return 'Sem variação em relação ao mês anterior'

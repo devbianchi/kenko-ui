@@ -2,7 +2,8 @@ import { useSearchParams } from 'react-router'
 import { CountCard, MetricCard } from '../../../shared/components/DashboardCard'
 import { MonthTransition } from '../../../shared/components/MonthTransition'
 import { UpcomingAppointments } from '../components/UpcomingAppointments'
-import { durationDifference, formatDay, formatDuration, homeData, readHomeMonth } from '../data/home'
+import { durationDifference, formatDay, homeData, readHomeMonth } from '../data/home'
+import { formatDuration } from '../../../shared/utils/duration'
 import type { HomeData } from '../data/home'
 
 export function HomePage({ data = homeData }: { data?: HomeData }) {
