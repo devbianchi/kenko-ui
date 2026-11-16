@@ -25,6 +25,16 @@ function LocationSearch() {
   return <>{useLocation().search}</>
 }
 
+it('abre a data selecionada e mantém o resumo estático aprovado para o protótipo Dia', async () => {
+  const user = userEvent.setup()
+  renderCalendar()
+  const day = screen.getByRole('link', { name: '2026-10-01, 3 consultas' })
+  expect(day).toHaveAttribute('href', '/calendar/2026-10-01')
+  await user.click(day)
+  expect(screen.getByRole('heading', { name: '1 de outubro/2026, quinta-feira' })).toBeVisible()
+  expect(screen.getByRole('article', { name: 'Total' })).toHaveTextContent('Total4')
+})
+
 it('filtra mês pela URL, preserva parâmetros extras e limita valores fora da faixa', async () => {
   const user = userEvent.setup()
   const firstRender = renderCalendar()
@@ -52,15 +62,15 @@ it('filtra mês pela URL, preserva parâmetros extras e limita valores fora da f
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11')
 })
 
-it('mantém a rota placeholder Dia para datas internas e adjacentes', async () => {
+it('abre a página Dia com a data adjacente selecionada', async () => {
   const user = userEvent.setup()
   renderCalendar()
   await user.click(screen.getByRole('link', { name: '2026-09-27, 0 consultas' }))
-  expect(screen.getByRole('heading', { name: 'Dia 2026-09-27' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '27 de setembro/2026, domingo' })).toBeVisible()
 })
 
 it('permite navegar por um dia interno ao mês selecionado', async () => {
   renderCalendar()
   fireEvent.click(screen.getByRole('link', { name: '2026-10-01, 3 consultas' }))
-  expect(screen.getByRole('heading', { name: 'Dia 2026-10-01' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '1 de outubro/2026, quinta-feira' })).toBeVisible()
 })

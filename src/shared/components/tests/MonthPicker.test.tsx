@@ -10,6 +10,25 @@ beforeEach(() => {
 })
 afterEach(() => vi.useRealTimers())
 
+it('rejeita submit de período futuro e permite corrigir até o mês atual', async () => {
+  const user = userEvent.setup()
+  const change = vi.fn()
+  render(<MonthPicker value="2025-12" onChange={change} />)
+  await user.click(screen.getByLabelText('Mês e ano'))
+  const year = screen.getByRole('spinbutton', { name: 'Ano' })
+  await user.clear(year)
+  await user.type(year, '2026')
+  expect(screen.getByRole('alert')).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Aplicar' })).toBeDisabled()
+  fireEvent.submit(screen.getByRole('form', { name: 'Aplicar período' }))
+  expect(change).not.toHaveBeenCalled()
+  expect(screen.getByLabelText('Mês e ano')).toHaveTextContent('Dezembro 2025')
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Mês' }), '11')
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'Aplicar' }))
+  expect(change).toHaveBeenCalledExactlyOnceWith('2026-11')
+})
+
 it('mantém o rascunho fora da URL e confirma mês e ano juntos ao aplicar', async () => {
   const user = userEvent.setup()
   const change = vi.fn()
