@@ -34,7 +34,7 @@ A entrega atual é um protótipo funcional com dados estáticos. Implementar e t
 
 ## 2. Base técnica e limites
 
-A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. Home, Calendário e Dia apresentam protótipos com mocks; Home e Calendário compartilham o filtro mensal. Analytics e Showcase ainda são placeholders. Nenhuma página está integrada à API. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
+A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. Home, Calendário, Dia e Analytics apresentam protótipos com mocks. Home, Calendário e Analytics compartilham o seletor de período. Nenhuma página está integrada à API. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
 
 Biblioteca de gráficos, formulários, estado/cache, hospedagem e organização adicional continuam decisões de implementação, conforme a tarefa. Lint ainda não está configurado; quando solicitado pelas skills, registrar essa limitação sem alegar execução. A infraestrutura de testes está descrita abaixo.
 
@@ -124,6 +124,10 @@ Apresentação do Dia: cabeçalho da tabela de salas com degradê contínuo e ca
 
 Filtro semana/mês/ano governa cinco KPIs e seis gráficos definidos em §6. Não permitir ano futuro. Não há filtros por paciente/médico/sala, exportação, exploração de pessoas por barra ou construtor de relatórios.
 
+No protótipo, todos os meses reutilizam o mesmo mock mensal. O título e os blocos da série acompanham o mês selecionado. A página abre em outubro de 2026. Para semana e ano, a interface informa a ausência de um agregado local. Os percentuais dos cinco cards iniciais são arredondados ao inteiro mais próximo.
+
+Em Analytics, uma referência de período inválida exibe a tela de data inválida do Dia, com instruções de semana, mês e ano e retorno explícito para Analytics. A URL original é preservada. As barras de términos e as células do mapa de calor compartilham o popup do histograma para ponteiro e teclado, inclusive quando a contagem é zero.
+
 Usar “conversas iniciadas fora do expediente”, não o rótulo ilustrativo “Mensagens Fora do Expediente”. Títulos/eixos da série acompanham a granularidade do filtro, sem oito semanas fixas.
 
 ### Showcase — TELA-05, RF-15
@@ -172,7 +176,7 @@ Usar America/Sao_Paulo para negócio e apresentação. Intervalos incluem iníci
 
 Filtros de Analytics: semana = sete datas terminando na referência; mês = mês indicado; ano corrente = janeiro até fim do mês atual, anteriores = doze meses. Não permitir ano futuro. Capacidade futura dentro do período entra na ocupação. Comparação usa período imediatamente anterior de mesma duração, não necessariamente mês de calendário.
 
-Percentuais 0–100, exibidos com uma casa decimal, exceto na página Dia, que arredonda completude e ocupação ao inteiro mais próximo; contagens inteiras; durações em minutos/segundos. Preservar precisão até apresentação. Zero é valor válido; estatística sem base é null (“—”), nunca zero artificial. Coleções vazias são válidas. Variação usa pontos percentuais, segundos ou contagem absoluta conforme a unidade. Usar melhoria/piora somente quando houver sentido favorável definido; aumento fora do expediente não tem interpretação favorável presumida. Tratamento específico de difference null será definido posteriormente; não inferir diferença ou base de comparação no cliente.
+Percentuais 0–100, exibidos com uma casa decimal, exceto nos cards iniciais de Analytics e nos indicadores de completude e ocupação do Dia, que exibem percentuais inteiros; contagens inteiras; durações em minutos/segundos. Preservar precisão até apresentação. Zero é valor válido; estatística sem base é null (“—”), nunca zero artificial. Coleções vazias são válidas. Variação usa pontos percentuais, segundos ou contagem absoluta conforme a unidade. Usar melhoria/piora somente quando houver sentido favorável definido; aumento fora do expediente não tem interpretação favorável presumida. Tratamento específico de difference null será definido posteriormente; não inferir diferença ou base de comparação no cliente.
 
 Empates em rankings: data/hora mais cedo ou menor número de sala. Mesmos dados/filtros/instante explicam resultados; indicadores dependentes do relógio podem mudar sem novos registros.
 

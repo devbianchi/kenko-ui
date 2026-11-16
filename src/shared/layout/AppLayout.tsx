@@ -4,9 +4,11 @@ import { MonthPicker } from '../components/MonthPicker'
 import { readCalendarMonth } from '../../features/calendar/data/calendar'
 import { readHomeMonth } from '../../features/home/data/home'
 import { AppHeader } from './AppHeader'
+import { AnalyticsFilter } from '../../features/analytics/components/AnalyticsFilter'
 
 export function AppLayout() {
   const isHome = useMatch('/home')
+  const isAnalytics = useMatch('/analytics')
   const isCalendar = useMatch('/calendar')
   const isShowcase = useLocation().pathname.startsWith('/showcase')
   const [searchParams, setSearchParams] = useSearchParams()
@@ -30,7 +32,7 @@ export function AppLayout() {
     })
   }
 
-  const actions = isHome || isCalendar ? <MonthPicker value={month} onChange={applyMonth} /> : undefined
+  const actions = isHome || isCalendar ? <MonthPicker value={month} onChange={applyMonth} /> : isAnalytics && <AnalyticsFilter />
 
   return (
     <div className="[--spacing:0.25em] min-h-screen w-[90%] max-w-[1568px] mx-auto pt-[clamp(20px,1.61vw,28px)] pb-8 text-sm min-[1000px]:text-[clamp(12px,1.035vw,18px)]">

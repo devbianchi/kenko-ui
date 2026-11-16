@@ -2,12 +2,13 @@ import type { ReactNode } from "react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router";
 
-type Tone = "light" | "dark" | "primary" | "cancelled";
+type Tone = "light" | "dark" | "primary" | "cancelled" | "gray";
 const tones = {
   light: "bg-background text-foreground",
   dark: "bg-foreground text-background",
   primary: "bg-primary text-background",
   cancelled: "bg-day-cancelled text-foreground",
+  gray: "bg-gray text-foreground",
 };
 
 type DashboardCardProps = {
