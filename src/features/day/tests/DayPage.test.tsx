@@ -106,3 +106,51 @@ it('oculta somente a seta que ultrapassaria os limites de meses válidos', () =>
   expect(screen.getByRole('button', { name: 'Dia anterior' })).toHaveClass('invisible')
   expect(screen.getByRole('button', { name: 'Próximo dia' })).toHaveClass('invisible')
 })
+
+it.each(['invalid', '2026-02-30', '2026-13-01'])('rejeita data inválida da rota: %s', date => {
+  renderDay(`/calendar/${date}`)
+  expect(screen.getByRole('heading', { name: 'Data não disponível' })).toBeVisible()
+})
+
+it('aceita o dia bissexto sem deslocar sua data', () => {
+  renderDay('/calendar/2024-02-29')
+  expect(screen.getByRole('heading', { name: '29 de Fevereiro' })).toBeVisible()
+  expect(screen.getByText('2024, Quinta-feira')).toBeVisible()
+})
+
+it('distingue completude sem base de contagens zeradas', () => {
+  renderDay('/calendar/2026-11-10', {
+    summary: { total: 0, complete: 0, pending: 0, cancelled: 0 },
+    appointmentsByHour: { hours: [], counts: [] }, rooms: [],
+  })
+  expect(screen.getByRole('article', { name: 'Total' })).toHaveTextContent('Total0')
+  expect(screen.getByRole('article', { name: 'Taxa de Completude' })).toHaveTextContent('Taxa de Completude—')
+  expect(screen.getByRole('article', { name: 'Taxa de Completude' })).not.toHaveTextContent('%')
+  expect(screen.getByText('Sem horários cadastrados.')).toBeVisible()
+  expect(screen.getByRole('img', { name: 'Manhã: 0; Tarde: 0' })).toBeVisible()
+  expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(1)
+})
+
+it('exibe completude arredondada ao inteiro sem excluir canceladas da base', () => {
+  renderDay('/calendar/2026-11-10', {
+    ...diaMock.data, summary: { total: 3, complete: 1, pending: 1, cancelled: 1 },
+  })
+  expect(screen.getByRole('article', { name: 'Taxa de Completude' })).toHaveTextContent('33%')
+})
+
+it('exibe ocupação por contagem de slots arredondada ao inteiro', () => {
+  renderDay('/calendar/2026-11-10', {
+    ...diaMock.data, rooms: [{ ...diaMock.data.rooms[0], totalSlots: 3, occupiedSlots: 2 }],
+  })
+  expect(screen.getByRole('row', { name: /Sala 1/ })).toHaveTextContent('67%')
+})
+
+it('exibe zero percentual quando a base é positiva', () => {
+  renderDay('/calendar/2026-11-10', {
+    ...diaMock.data,
+    summary: { total: 1, complete: 0, pending: 0, cancelled: 1 },
+    rooms: [{ ...diaMock.data.rooms[0], appointmentCount: 1, cancelledCount: 1, totalSlots: 3, occupiedSlots: 0 }],
+  })
+  expect(screen.getByRole('article', { name: 'Taxa de Completude' })).toHaveTextContent('0%')
+  expect(screen.getByRole('row', { name: /Sala 1/ })).toHaveTextContent('0%')
+})

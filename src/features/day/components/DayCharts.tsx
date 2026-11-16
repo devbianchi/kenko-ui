@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 type HourlySeries = { hours: readonly number[]; counts: readonly number[] }
@@ -15,6 +15,15 @@ export function HourlyAppointmentsChart(series: HourlySeries) {
   const [tooltipVisible, setTooltipVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [position, setPosition] = useState({ left: 0, top: 0 })
+
+  useEffect(() => {
+    if (!tooltipVisible) return
+    function dismissOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setTooltipVisible(false)
+    }
+    document.addEventListener('keydown', dismissOnEscape)
+    return () => document.removeEventListener('keydown', dismissOnEscape)
+  }, [tooltipVisible])
 
   function showTooltip(index: number, clientX: number, clientY: number) {
     setPosition({ left: clientX, top: clientY })
@@ -47,13 +56,14 @@ export function HourlyAppointmentsChart(series: HourlySeries) {
               <rect x={x} y={chartHeight - Math.max(height, 8) + 4} width={barWidth} height={Math.max(height, 8)} rx="6" fill={count === 0 ? 'transparent' : 'var(--color-primary)'} tabIndex={0} aria-label={tooltip}
                 aria-describedby={tooltipVisible && activeIndex === index ? tooltipId : undefined}
                 onPointerEnter={event => showTooltip(index, event.clientX, event.clientY)}
-                onPointerMove={event => showTooltip(index, event.clientX, event.clientY)}
+                onPointerMove={event => {
+                  if (tooltipVisible) setPosition({ left: event.clientX, top: event.clientY })
+                }}
                 onPointerLeave={() => setTooltipVisible(false)}
                 onFocus={event => {
                   const bounds = event.currentTarget.getBoundingClientRect()
                   showTooltip(index, bounds.left + bounds.width / 2, bounds.top)
                 }} onBlur={() => setTooltipVisible(false)}
-                onKeyDown={event => { if (event.key === 'Escape') setTooltipVisible(false) }}
               />
             </g>
           })}

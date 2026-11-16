@@ -14,7 +14,10 @@ export function MonthTransition({
   const [visible, setVisible] = useState(true)
 
   useEffect(() => {
-    if (value === displayedValue) return
+    if (value === displayedValue) {
+      setVisible(true)
+      return
+    }
 
     const reducedMotion = typeof window.matchMedia === 'function'
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches

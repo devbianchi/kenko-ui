@@ -3,6 +3,15 @@ import { render, screen } from '@testing-library/react'
 import { expect, it } from 'vitest'
 import { DayPeriodChart, HourlyAppointmentsChart } from '../DayCharts'
 
+it('limita a série ao expediente básico aprovado, incluindo 7 e 17 e excluindo 6 e 18', () => {
+  render(<HourlyAppointmentsChart hours={[6, 7, 17, 18]} counts={[3, 1, 2, 4]} />)
+  expect(screen.getByLabelText('07:00 — 1 consultas')).toBeVisible()
+  expect(screen.getByLabelText('17:00 — 2 consultas')).toBeVisible()
+  expect(screen.queryByLabelText('06:00 — 3 consultas')).not.toBeInTheDocument()
+  expect(screen.queryByLabelText('18:00 — 4 consultas')).not.toBeInTheDocument()
+  expect(screen.getByRole('img', { name: 'Consultas por horário, 2 horários' })).toBeVisible()
+})
+
 it('dimensiona série horária pelos dados recebidos e preserva zeros', () => {
   const { container } = render(<HourlyAppointmentsChart hours={[6, 7, 8, 10, 14, 17, 18]} counts={[30, 0, 2, 4, 0, 5, 40]} />)
   expect(screen.getByRole('img', { name: 'Consultas por horário, 5 horários' })).toBeVisible()
@@ -62,5 +71,16 @@ it('oferece popup pelo teclado, fecha com Escape e ao perder foco', async () => 
   await user.tab()
   expect(screen.getByRole('tooltip')).toHaveTextContent('08:00 — 3 consultas')
   await user.tab()
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+})
+
+it('fecha com Escape o popup aberto pelo ponteiro mesmo com foco fora do gráfico', async () => {
+  const user = userEvent.setup()
+  render(<><button>Antes do gráfico</button><HourlyAppointmentsChart hours={[9]} counts={[2]} /></>)
+  await user.tab()
+  await user.hover(screen.getByLabelText('09:00 — 2 consultas'))
+  expect(screen.getByRole('button', { name: 'Antes do gráfico' })).toHaveFocus()
+  expect(screen.getByRole('tooltip')).toHaveTextContent('09:00 — 2 consultas')
+  await user.keyboard('{Escape}')
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 })
