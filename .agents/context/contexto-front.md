@@ -112,6 +112,8 @@ Dimensões do protótipo: cards seguem aproximadamente a proporção 3:2 do desi
 
 ### Dia — TELA-03, RF-13
 
+Datas rejeitadas mostram o cartão de `public/assets/Data Inválida.png` com retorno ao calendário. O clique ancora o popup horário no ponto do ponteiro. O foco por Tab o ancora acima da barra.
+
 Decisões do protótipo confirmadas pelo usuário durante a revisão de Calendário/Dia: reutilizar o mesmo `diaMock` para todas as datas, alterando apenas a data do título; a igualdade entre totais do Calendário e Dia por data fica para a integração. O gráfico horário apresenta somente o expediente básico de 07h a 17h (início incluído, fechamento às 18h excluído). Esse recorte é intencional e substitui, nesta etapa, a exigência de exibir todas as horas recebidas descrita abaixo. A integração futura deve usar os dados e o expediente efetivos da clínica.
 
 Sem filtro próprio. Exibir total/status, taxa de completude, consultas por hora, manhã/tarde e tabela por sala: consultas, canceladas entre parênteses, ocupação e pico. Manhã é antes de 12h; tarde é a partir de 12h. Incluir salas cadastradas sem consultas; ocupação sem capacidade é “—”. Não omitir horas cadastradas porque o PNG ilustra 9h–20h. Não há pacientes por sala ou tela extra de detalhe.
