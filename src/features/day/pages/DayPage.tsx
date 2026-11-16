@@ -1,5 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
+import { InvalidDate } from '../../../shared/components/InvalidDate'
 import { DashboardCard, CountCard } from '../../../shared/components/DashboardCard'
 import { MonthTransition } from '../../../shared/components/MonthTransition'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
@@ -126,21 +127,12 @@ export function DayPage({ data = diaMock.data }: { data?: DayData }) {
   const month = date.slice(0, 7)
   if (!parseDate(date) || month < MIN_SELECTABLE_MONTH || month > currentBusinessMonth()) {
     return (
-      <section className="mx-auto mt-6 max-w-[43em] space-y-5 rounded-3xl bg-background p-4 text-center shadow-card sm:mt-12 sm:p-7">
-        <header className="rounded-lg bg-foreground p-4 text-background">
-          <h1 className="font-heading text-metric font-bold sm:text-page">Data Inválida :/</h1>
-          <p>Ops! parece que tivemos um problema ao buscar a data que você forneceu.</p>
-        </header>
-        <div className="mx-auto w-fit text-left">
-          <p>Tenha certeza de que sua data:</p>
-          <ul className="list-disc pl-6 font-semibold">
-            <li>Foi inserida corretamente (Ex. 2026-11-10)</li>
-            <li>Está entre o período suportado pela aplicação</li>
-            <li>(Janeiro de 2024 ao mês e ano atuais)</li>
-          </ul>
-        </div>
-        <Link to="/calendar" className="inline-block rounded-xl bg-foreground px-4 py-2 font-semibold text-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:scale-102 motion-safe:active:scale-100">Voltar ao Calendário</Link>
-      </section>
+      <InvalidDate message="Ops! parece que tivemos um problema ao buscar a data que você forneceu."
+        returnTo="/calendar" returnLabel="Voltar ao Calendário">
+        <li>Foi inserida corretamente (Ex. 2026-11-10)</li>
+        <li>Está entre o período suportado pela aplicação</li>
+        <li>(Janeiro de 2024 ao mês e ano atuais)</li>
+      </InvalidDate>
     )
   }
   return <MonthTransition value={date}>{(displayedDate, transitioning) => (
