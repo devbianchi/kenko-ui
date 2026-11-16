@@ -1,10 +1,11 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { DashboardCard, CountCard } from '../../../shared/components/DashboardCard'
 import { MonthTransition } from '../../../shared/components/MonthTransition'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
 import { diaMock } from '../../../../mocks/day/dia'
-import { DayPeriodChart, HourlyAppointmentsChart } from '../components/DayCharts'
+import { DayPeriodChart } from '../components/DayPeriodChart'
+import { HourlyAppointmentsChart } from '../components/HourlyAppointmentsChart'
 
 export type DayData = {
   summary: { total: number; complete: number; pending: number; cancelled: number }
@@ -42,41 +43,32 @@ function formatOccupancy(occupied: number, capacity: number) {
   return `${Math.round((occupied / capacity) * 100)}%`
 }
 
-function DayContent({ date, data }: { date: string; data: DayData }) {
+function DayContent({ date, data, transitioning }: { date: string; data: DayData; transitioning: boolean }) {
   const navigate = useNavigate()
   const { summary, appointmentsByHour, rooms } = data
-  const selectedDate = parseDate(date)
-  const dateValue = selectedDate?.toISOString().slice(0, 10) ?? ''
-  const selectedMonth = dateValue.slice(0, 7)
-  const isValidMonth = selectedMonth >= MIN_SELECTABLE_MONTH && selectedMonth <= currentBusinessMonth()
-  const canMovePrevious = Boolean(selectedDate && isValidMonth && addDays(selectedDate, -1).slice(0, 7) >= MIN_SELECTABLE_MONTH)
-  const canAdvance = Boolean(selectedDate && isValidMonth && addDays(selectedDate, 1).slice(0, 7) <= currentBusinessMonth())
-  const dateHeading = selectedDate && isValidMonth ? formatDateHeading(selectedDate) : null
-
-  function moveToDay(offset: number) {
-    if (!selectedDate || !isValidMonth) return
-    const nextDate = addDays(selectedDate, offset)
-    const targetMonth = nextDate.slice(0, 7)
-    if (targetMonth < MIN_SELECTABLE_MONTH || targetMonth > currentBusinessMonth()) return
-    navigate(`/calendar/${nextDate}`)
-  }
+  const selectedDate = new Date(`${date}T12:00:00Z`)
+  const previous = addDays(selectedDate, -1)
+  const next = addDays(selectedDate, 1)
+  const canMovePrevious = previous.slice(0, 7) >= MIN_SELECTABLE_MONTH
+  const canAdvance = next.slice(0, 7) <= currentBusinessMonth()
+  const dateHeading = formatDateHeading(selectedDate)
 
   return (
     <div className="space-y-5">
       <header>
         <div role="group" aria-label="Navegação entre dias" className="flex items-center gap-1.5 sm:gap-2">
-          <button type="button" aria-label="Dia anterior" disabled={!canMovePrevious} onClick={() => moveToDay(-1)}
+          <button type="button" aria-label="Dia anterior" disabled={!canMovePrevious || transitioning} onClick={() => navigate(`/calendar/${previous}`)}
             className={`grid size-8 shrink-0 place-items-center rounded-full bg-foreground text-background transition-[scale,opacity] duration-200 ease-out hover:scale-102 hover:opacity-70 active:scale-95 disabled:cursor-not-allowed motion-reduce:transition-none ${canMovePrevious ? '' : 'invisible'}`}>
             <ChevronLeftIcon className="size-6" aria-hidden="true" />
           </button>
-          <button type="button" aria-label="Próximo dia" disabled={!canAdvance} onClick={() => moveToDay(1)}
+          <button type="button" aria-label="Próximo dia" disabled={!canAdvance || transitioning} onClick={() => navigate(`/calendar/${next}`)}
             className={`grid size-8 shrink-0 place-items-center rounded-full bg-foreground text-background transition-[scale,opacity] duration-200 ease-out hover:scale-102 hover:opacity-70 active:scale-95 disabled:cursor-not-allowed motion-reduce:transition-none ${canAdvance ? '' : 'invisible'}`}>
             <ChevronRightIcon className="size-6" aria-hidden="true" />
           </button>
-          <h1 className="min-w-0 font-heading text-metric leading-tight font-bold tracking-tight text-foreground sm:text-page">{dateHeading?.title ?? 'Data não disponível'}</h1>
+          <h1 className="min-w-0 font-heading text-metric leading-tight font-bold tracking-tight text-foreground sm:text-page">{dateHeading.title}</h1>
         </div>
         <div className="mt-1 flex items-center justify-between gap-4">
-          <p className="text-body font-semibold text-foreground sm:text-section">{dateHeading?.subtitle ?? ''}</p>
+          <p className="text-body font-semibold text-foreground sm:text-section">{dateHeading.subtitle}</p>
           <p className="text-body text-text-muted sm:text-section">Consultas</p>
         </div>
       </header>
@@ -131,5 +123,27 @@ function DayContent({ date, data }: { date: string; data: DayData }) {
 
 export function DayPage({ data = diaMock.data }: { data?: DayData }) {
   const { date = '' } = useParams()
-  return <MonthTransition value={date}>{displayedDate => <DayContent date={displayedDate} data={data} />}</MonthTransition>
+  const month = date.slice(0, 7)
+  if (!parseDate(date) || month < MIN_SELECTABLE_MONTH || month > currentBusinessMonth()) {
+    return (
+      <section className="mx-auto mt-6 max-w-[43em] space-y-5 rounded-3xl bg-background p-4 text-center shadow-card sm:mt-12 sm:p-7">
+        <header className="rounded-lg bg-foreground p-4 text-background">
+          <h1 className="font-heading text-metric font-bold sm:text-page">Data Inválida :/</h1>
+          <p>Ops! parece que tivemos um problema ao buscar a data que você forneceu.</p>
+        </header>
+        <div className="mx-auto w-fit text-left">
+          <p>Tenha certeza de que sua data:</p>
+          <ul className="list-disc pl-6 font-semibold">
+            <li>Foi inserida corretamente (Ex. 2026-11-10)</li>
+            <li>Está entre o período suportado pela aplicação</li>
+            <li>(Janeiro de 2024 ao mês e ano atuais)</li>
+          </ul>
+        </div>
+        <Link to="/calendar" className="inline-block rounded-xl bg-foreground px-4 py-2 font-semibold text-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:scale-102 motion-safe:active:scale-100">Voltar ao Calendário</Link>
+      </section>
+    )
+  }
+  return <MonthTransition value={date}>{(displayedDate, transitioning) => (
+    <DayContent date={displayedDate} data={data} transitioning={transitioning} />
+  )}</MonthTransition>
 }

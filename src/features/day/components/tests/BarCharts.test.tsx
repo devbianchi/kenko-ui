@@ -1,7 +1,8 @@
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
 import { expect, it } from 'vitest'
-import { DayPeriodChart, HourlyAppointmentsChart } from '../DayCharts'
+import { DayPeriodChart } from '../DayPeriodChart'
+import { HourlyAppointmentsChart } from '../HourlyAppointmentsChart'
 
 it('limita a série ao expediente básico aprovado, incluindo 7 e 17 e excluindo 6 e 18', () => {
   render(<HourlyAppointmentsChart hours={[6, 7, 17, 18]} counts={[3, 1, 2, 4]} />)
@@ -19,7 +20,6 @@ it('dimensiona série horária pelos dados recebidos e preserva zeros', () => {
   expect(container.querySelector('title')).toBeNull()
   expect(screen.getByLabelText('10:00 — 4 consultas')).toBeVisible()
   expect(container.querySelectorAll('rect')).toHaveLength(5)
-  expect(screen.getByLabelText('10:00 — 4 consultas')).toBeVisible()
   expect(container.querySelector('svg text')).toBeNull()
   expect(container.querySelectorAll('[aria-hidden="true"] span')).toHaveLength(5)
   expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('78101417')
@@ -40,7 +40,19 @@ it('mostra estado vazio sem horas e ignora contagens sem horário correspondente
   expect(screen.getByLabelText('09:00 — 2 consultas')).toBeVisible()
   expect(container.querySelector('title')).toBeNull()
 })
-
+it('posiciona o popup no ponto de cada clique, inclusive ao receber foco', async () => {
+  const user = userEvent.setup()
+  render(<HourlyAppointmentsChart hours={[9]} counts={[2]} />)
+  const bar = screen.getByLabelText('09:00 — 2 consultas')
+  for (const y of [90, 65]) {
+    await user.pointer({ target: bar, keys: '[MouseLeft]', coords: { x: 80, y } })
+    expect(screen.getByRole('tooltip')).toHaveStyle({ left: '80px', top: `${y}px` })
+  }
+  await user.keyboard('{Escape}')
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+  await user.pointer({ target: bar, keys: '[MouseLeft]', coords: { x: 80, y: 65 } })
+  expect(screen.getByRole('tooltip')).toHaveStyle({ left: '80px', top: '65px' })
+})
 
 it('mostra a contagem exata em popup customizado no hover e remove ao sair', async () => {
   const user = userEvent.setup()
