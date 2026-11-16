@@ -31,7 +31,8 @@ it('abre a data selecionada e mantém o resumo estático aprovado para o protót
   const day = screen.getByRole('link', { name: '2026-10-01, 3 consultas' })
   expect(day).toHaveAttribute('href', '/calendar/2026-10-01')
   await user.click(day)
-  expect(screen.getByRole('heading', { name: '1 de outubro/2026, quinta-feira' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '1 de Outubro' })).toBeVisible()
+  expect(screen.getByText('2026, Quinta-feira')).toBeVisible()
   expect(screen.getByRole('article', { name: 'Total' })).toHaveTextContent('Total4')
 })
 
@@ -66,11 +67,13 @@ it('abre a página Dia com a data adjacente selecionada', async () => {
   const user = userEvent.setup()
   renderCalendar()
   await user.click(screen.getByRole('link', { name: '2026-09-27, 0 consultas' }))
-  expect(screen.getByRole('heading', { name: '27 de setembro/2026, domingo' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '27 de Setembro' })).toBeVisible()
+  expect(screen.getByText('2026, Domingo')).toBeVisible()
 })
 
 it('permite navegar por um dia interno ao mês selecionado', async () => {
   renderCalendar()
   fireEvent.click(screen.getByRole('link', { name: '2026-10-01, 3 consultas' }))
-  expect(screen.getByRole('heading', { name: '1 de outubro/2026, quinta-feira' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '1 de Outubro' })).toBeVisible()
+  expect(screen.getByText('2026, Quinta-feira')).toBeVisible()
 })

@@ -97,8 +97,9 @@ it('grava o mês na URL, preserva outros parâmetros e restaura o período ao vo
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo')
   await user.click(screen.getByRole('button', { name: 'Aplicar' }))
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-10&origin=demo')
+  expect(await screen.findByLabelText('Mês selecionado: 2026-10')).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Voltar' }))
-  expect(screen.getByLabelText('Mês selecionado: 2026-11')).toBeVisible()
+  expect(await screen.findByLabelText('Mês selecionado: 2026-11')).toBeVisible()
   expect(screen.getByLabelText('Mês e ano')).toHaveTextContent('Novembro')
 })
 

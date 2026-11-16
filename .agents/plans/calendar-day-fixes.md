@@ -13,3 +13,6 @@ Objetivo: resolver o retorno RV1–RV4 e conferir a implementação funcional de
 Decisões: reaproveitar transição, portal e cards existentes. Aplicar formatação percentual somente na apresentação. Documentar o contrato compartilhado já implementado e manter os relatórios históricos como registros da etapa correspondente.
 
 Riscos cobertos: timers cancelados durante a troca, divisão sem base, fechamento por Escape quando a barra não recebe o evento de teclado e perda de parâmetros no histórico. A alteração na transição compartilhada exige suíte completa e build.
+
+## Integração da main
+- INT-1: verificar dia e mês no título e ano e dia da semana no subtítulo após navegar pelo calendário e ao abrir o dia bissexto. Executar a suíte completa e o build antes do merge local.

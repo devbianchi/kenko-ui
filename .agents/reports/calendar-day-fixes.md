@@ -28,3 +28,7 @@ Escopo da validação: árvore de trabalho local sobre 75119d3. Os testes de nav
 
 Status: B1–B5 implementados e exercitados na base local.
 Checks: npm run build e git diff --check passaram. npm test executou 80 casos, com 77 aprovados e 3 falhas em Home/MonthPicker (dois timeouts de 5 s e uma leitura do mês durante a transição). As três specs de Dia, Home e MonthPicker passaram juntas com --maxWorkers=1, 50/50. Todos os casos passaram entre as execuções, mas a execução integral em paralelo apresentou instabilidade. Lint indisponível no projeto.
+
+## Integração de origin/main em 32f1b2f
+INT-1 concluído. DayPage.tsx:76 e :79 exibem título e subtítulo separados. CalendarPage.test.tsx:34, :70 e :77 e DayPage.test.tsx:117 verificam os dois campos após navegação e na data bissexta. HomePage.test.tsx aguarda a troca visível do mês em ambas as direções para exercitar a restauração pelo histórico. As correções de integração alteram apenas testes e documentação.
+Verificações: suíte completa com um worker, 87/87 em 11 arquivos. Home verificada novamente, 27/27. Build de produção com TypeScript aprovado. O projeto não define script de lint.
