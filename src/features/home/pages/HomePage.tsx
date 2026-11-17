@@ -19,7 +19,7 @@ export function HomePage({ data = homeData }: { data?: HomeData }) {
             {displayedMonth => {
               const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: 'UTC' })
                 .format(new Date(`${displayedMonth}-15T12:00:00Z`))
-              return <div className="flex min-h-status-card flex-col items-center justify-center rounded-card bg-primary text-background" aria-label={`Mês selecionado: ${displayedMonth}`}>
+              return <div className="flex min-h-status-card flex-col items-center justify-center rounded-card bg-primary text-background dark:shadow-card" aria-label={`Mês selecionado: ${displayedMonth}`}>
                 <span className="text-month leading-[.85] font-semibold capitalize">{monthName}</span><span className="text-month leading-[.85] font-semibold">{displayedMonth.slice(0, 4)}</span>
               </div>
             }}

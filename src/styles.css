@@ -31,11 +31,16 @@
     var(--color-gradient-start),
     var(--color-gradient-end)
   );
+  --color-theme-button: var(--color-foreground);
+  --color-theme-icon: var(--color-background);
+  --color-brand-ink: var(--color-foreground);
+  --color-gray-ink: var(--color-foreground);
+  --color-avatar-ink: var(--color-background);
   --color-nav-hover: rgb(255 255 255 / 12%);
   --color-field-background: var(--color-background);
   --color-focus-ring: var(--color-secondary);
-  --shadow-card: 0 2px 4px rgb(41 54 50 / 18%), 0 0 4px rgb(41 54 50 / 4%);
-  --shadow-card-hover: 0 6px 14px rgb(41 54 50 / 13%);
+  --shadow-card: var(--card-elevation);
+  --shadow-card-hover: var(--card-hover-elevation);
   --radius-card: 1em;
   --color-foreground: #293632;
   --color-background: #f5f8f6;
@@ -58,3 +63,34 @@
   --font-brand-japanese:
     "Zen Maru Gothic", ui-sans-serif, system-ui, sans-serif;
 }
+
+:root {
+  --card-elevation: 0 2px 4px rgb(41 54 50 / 18%), 0 0 4px rgb(41 54 50 / 4%);
+  --card-hover-elevation: 0 6px 14px rgb(41 54 50 / 13%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-foreground: #e7edf1;
+  --color-background: #212f3b;
+  --color-border: #344550;
+  --color-text-muted: rgb(148 166 176 / 60%);
+  --color-primary: #75b8d8;
+  --color-secondary: #398fb5;
+  --color-tertiary: #9ddced;
+  --color-tertiary-2: #316a87;
+  --color-chatbot: #89d8ee;
+  --color-chat-panel: #202a32;
+  --color-gradient-start: #659db9;
+  --color-gradient-end: #327799;
+  --color-theme-button: var(--color-background);
+  --color-theme-icon: var(--color-foreground);
+  --color-brand-ink: var(--color-background);
+  --color-gray-ink: var(--color-background);
+  --color-avatar-ink: var(--color-chatbot);
+  --color-nav-hover: rgb(33 47 59 / 12%);
+  --card-elevation: 0 3px 7px rgb(0 0 0 / 40%), 0 1px 3px rgb(0 0 0 / 28%);
+  --card-hover-elevation: 0 6px 14px rgb(0 0 0 / 52%), 0 2px 4px rgb(0 0 0 / 32%);
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

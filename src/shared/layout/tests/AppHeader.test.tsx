@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 import { AppHeader } from '../AppHeader'
 
 it.each([false, true])('mantém a marca acessível no cabeçalho com showcase=%s', showcase => {
@@ -41,4 +41,44 @@ it('navega para Analytics e atualiza o link ativo após o clique', async () => {
   expect(screen.queryByRole('heading', { name: 'Resumo mensal' })).not.toBeInTheDocument()
   expect(analyticsLink).toHaveAttribute('aria-current', 'page')
   expect(homeLink).not.toHaveAttribute('aria-current')
+})
+
+afterEach(() => {
+  delete document.documentElement.dataset.theme
+})
+
+it.each([null, 'inválido'])('abre em modo claro com preferência %s', preference => {
+  if (preference !== null) localStorage.setItem('kenko-theme', preference)
+  render(<MemoryRouter><AppHeader /></MemoryRouter>)
+  expect(screen.getByRole('button', { name: 'Ativar modo escuro' })).toBeVisible()
+  expect(document.documentElement).toHaveAttribute('data-theme', 'light')
+})
+
+it('alterna o tema e mantém a escolha ao navegar e reabrir o Showcase', async () => {
+  const user = userEvent.setup()
+  const first = render(<MemoryRouter><AppHeader /></MemoryRouter>)
+  await user.click(screen.getByRole('button', { name: 'Ativar modo escuro' }))
+  await user.click(screen.getByRole('link', { name: 'Analytics' }))
+  expect(screen.getByRole('link', { name: 'Analytics' })).toHaveAttribute('aria-current', 'page')
+  expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+  first.unmount()
+
+  render(<MemoryRouter initialEntries={['/showcase']}><AppHeader showcase /></MemoryRouter>)
+  const sun = screen.getByRole('button', { name: 'Ativar modo claro' })
+  expect(sun).toBeVisible()
+  sun.focus()
+  await user.keyboard('{Enter}')
+  expect(document.documentElement).toHaveAttribute('data-theme', 'light')
+  expect(localStorage.getItem('kenko-theme')).toBe('light')
+})
+
+it('mantém o controle funcional com armazenamento bloqueado', async () => {
+  const user = userEvent.setup()
+  const deny = () => { throw new DOMException('Acesso negado', 'SecurityError') }
+  vi.spyOn(Storage.prototype, 'getItem').mockImplementation(deny)
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(deny)
+  render(<MemoryRouter><AppHeader /></MemoryRouter>)
+  await user.click(screen.getByRole('button', { name: 'Ativar modo escuro' }))
+  expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+  expect(screen.getByRole('button', { name: 'Ativar modo claro' })).toBeVisible()
 })

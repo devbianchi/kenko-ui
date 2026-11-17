@@ -36,7 +36,7 @@ export function MonthCalendar({
                 >
                   <ArrowTopRightOnSquareIcon aria-hidden="true" className="absolute right-0.5 top-0.5 size-3 sm:right-1 sm:top-1 sm:size-3.5" />
                   <span className="border-b border-dotted border-secondary text-section leading-none font-bold sm:text-[2.5em]">{day}</span>
-                  <span className="max-w-full wrap-break-word text-[0.65rem] sm:text-label leading-none text-text-muted">{count} consultas</span>
+                  <span className={`max-w-full wrap-break-word text-[0.65rem] sm:text-label leading-none text-text-muted ${isToday ? 'dark:text-foreground' : ''}`}>{count} consultas</span>
                 </Link>
               )
             })}
