@@ -7,8 +7,8 @@ const tones = {
   light: "bg-background text-foreground",
   dark: "bg-foreground text-background",
   primary: "bg-primary text-background",
-  cancelled: "bg-day-cancelled text-foreground",
-  gray: "bg-gray text-foreground",
+  cancelled: "bg-day-cancelled text-gray-ink",
+  gray: "bg-gray text-gray-ink",
 };
 
 type DashboardCardProps = {

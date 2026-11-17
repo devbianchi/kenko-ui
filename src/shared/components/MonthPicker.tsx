@@ -65,11 +65,11 @@ export function PeriodPicker({ period, reference, allowPeriodChange = false, onA
           }
         }}
       >
-        <summary aria-label={allowPeriodChange ? 'Período de Analytics' : 'Mês e ano'} className="flex cursor-pointer list-none items-center gap-1 rounded-full bg-field-background px-2 py-1 text-label transition-opacity hover:opacity-80 [&::-webkit-details-marker]:hidden">
+        <summary aria-label={allowPeriodChange ? 'Período de Analytics' : 'Mês e ano'} className="flex cursor-pointer list-none items-center gap-1 rounded-full bg-field-background text-foreground px-2 py-1 text-label transition-opacity hover:opacity-80 [&::-webkit-details-marker]:hidden">
           <CalendarDaysIcon className="size-4" aria-hidden="true" />
           {allowPeriodChange ? periodLabels[period] : `${selected?.label} ${confirmedYear}`}
         </summary>
-        <form aria-label="Aplicar período" onSubmit={applyDraft} className="absolute right-0 z-20 mt-2 grid w-60 min-w-0 max-w-[calc(100vw-2rem)] grid-cols-1 origin-top-right gap-3 whitespace-normal rounded-card border border-border bg-background p-4 shadow-card motion-safe:group-open:animate-pop-in">
+        <form aria-label="Aplicar período" onSubmit={applyDraft} className="absolute right-0 z-20 mt-2 grid w-60 min-w-0 max-w-[calc(100vw-2rem)] grid-cols-1 origin-top-right gap-3 whitespace-normal rounded-card border border-border bg-background p-4 text-foreground shadow-card motion-safe:group-open:animate-pop-in">
           {allowPeriodChange && <label className="grid gap-1 text-label">
             Período
             <select value={periodDraft} onChange={event => {
@@ -112,13 +112,13 @@ export function PeriodPicker({ period, reference, allowPeriodChange = false, onA
               onChange={event => setYearDraft(event.target.value)}
             />
           </label>}
-          {validDraft ? null : <p role="alert" className="break-words text-label text-red-700">
+          {validDraft ? null : <p role="alert" className="break-words text-label text-red-700 dark:text-red-300">
             {periodDraft === 'month' ? 'Data inválida. Selecione um mês entre janeiro de 2024 e o mês atual.' : `Data inválida. Escolha um período entre janeiro de 2024 e ${today.split('-').reverse().join('/')}.`}
           </p>}
           <button
             type="submit"
             disabled={!validDraft}
-            className="w-full rounded-full bg-foreground px-4 py-2 text-label font-semibold text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray disabled:text-foreground disabled:opacity-70 motion-reduce:transition-none"
+            className="w-full rounded-full bg-foreground px-4 py-2 text-label font-semibold text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray disabled:text-gray-ink disabled:opacity-70 motion-reduce:transition-none"
           >
             Aplicar
           </button>

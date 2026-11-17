@@ -28,7 +28,7 @@ export function ShowcasePage() {
           <h1 id="showcase-title" className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Showcase</h1>
           <p className="mt-1 text-base text-text-muted sm:text-lg">Experimente o fluxo do nosso sistema e marque sua própria consulta!</p>
         </div>
-        <button type="button" onClick={createConversation} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-foreground px-3 py-2 text-label font-semibold text-background shadow-card transition-[scale,opacity] duration-150 hover:opacity-90 active:scale-95 motion-reduce:transition-none">
+        <button type="button" onClick={createConversation} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-foreground px-3 py-2 text-label font-semibold text-background dark:bg-background dark:text-foreground shadow-card transition-[scale,opacity] duration-150 hover:opacity-90 active:scale-95 motion-reduce:transition-none">
           <PlusIcon aria-hidden="true" className="size-5" /> Nova Conversa
         </button>
       </div>

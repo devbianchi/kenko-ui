@@ -1,5 +1,6 @@
 import { CalendarDaysIcon, ChartBarIcon, ChatBubbleLeftIcon, HomeIcon } from '@heroicons/react/24/outline'
 import { Link, NavLink } from 'react-router'
+import { ThemeToggle } from './ThemeToggle'
 import type { ReactNode } from 'react'
 
 const links = [
@@ -27,12 +28,15 @@ export function AppHeader({ showcase = false, actions }: { showcase?: boolean; a
           </nav>
         </div>
       </div>
-      <div className="flex min-h-14 w-full min-w-0 flex-1 flex-wrap items-center justify-between gap-2 rounded-lg bg-brand px-4 py-2 text-foreground sm:py-0 min-[1000px]:flex-nowrap">
-        <Link to="/home" className="inline-flex shrink-0 items-center gap-2 no-underline" aria-label="Kenko, página inicial">
-          <span className="translate-y-[.12em] font-brand text-brand font-normal underline decoration-secondary decoration-dotted decoration-2 underline-offset-4 tracking-wide">KENKO</span>
-          <span className="font-brand-japanese text-section font-normal tracking-widest" lang="ja">ケンコ</span>
-        </Link>
-        {actions}
+      <div className="flex min-h-14 w-full min-w-0 flex-1 flex-wrap items-center justify-between gap-2 rounded-lg bg-brand px-4 py-2 text-brand-ink sm:py-0 min-[1000px]:flex-nowrap">
+        <div className="flex items-center gap-2">
+          <Link to="/home" className="inline-flex shrink-0 items-center gap-2 no-underline" aria-label="Kenko, página inicial">
+            <span className="translate-y-[.12em] font-brand text-brand font-normal underline decoration-secondary decoration-dotted decoration-2 underline-offset-4 tracking-wide">KENKO</span>
+            <span className="font-brand-japanese text-section font-normal tracking-widest" lang="ja">ケンコ</span>
+          </Link>
+          <ThemeToggle />
+        </div>
+        {actions && <div className="ml-auto">{actions}</div>}
       </div>
     </header>
   )
