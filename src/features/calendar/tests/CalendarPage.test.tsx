@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { calendarioMock } from '../../../../mocks/calendar/calendario'
+import { diaMock } from '../../../../mocks/day/dia'
 import { AppLayout } from '../../../shared/layout/AppLayout'
 import { CalendarPage } from '../pages/CalendarPage'
 import { DayPage } from '../../day/pages/DayPage'
@@ -16,9 +17,9 @@ beforeEach(() => {
 })
 afterEach(() => vi.useRealTimers())
 
-/** Calendário com a API substituída: cada busca recebe o fixture, qualquer que seja o intervalo. */
+/** Calendário com a API substituída: a grade recebe o fixture do calendário, e o Dia, o do Dia. */
 function renderCalendar(route = '/calendar?month=2026-10&origin=demo', data: unknown = calendarioMock.data) {
-  const fetchMock = stubFetch(() => jsonResponse(envelope(data)))
+  const fetchMock = stubFetch(url => jsonResponse(envelope(url.pathname.includes('/calendar/days/') ? diaMock.data : data)))
   const view = render(<QueryClientProvider client={createTestQueryClient()}><MemoryRouter initialEntries={[route]}><Routes>
     <Route element={<AppLayout />}>
       <Route path="/calendar" element={<><CalendarPage /><output aria-label="URL atual"><LocationSearch /></output></>} />
@@ -38,7 +39,7 @@ it('abre a data selecionada e mantém o resumo estático aprovado para o protót
   const day = await screen.findByRole('link', { name: '2026-10-01, 3 consultas' })
   expect(day).toHaveAttribute('href', '/calendar/2026-10-01')
   await user.click(day)
-  expect(screen.getByRole('heading', { name: '1 de Outubro' })).toBeVisible()
+  expect(await screen.findByRole('heading', { name: '1 de Outubro' })).toBeVisible()
   expect(screen.getByText('2026, Quinta-feira')).toBeVisible()
   expect(screen.getByRole('article', { name: 'Total' })).toHaveTextContent('Total4')
 })
@@ -74,14 +75,14 @@ it('abre a página Dia com a data adjacente selecionada', async () => {
   const user = userEvent.setup()
   renderCalendar()
   await user.click(await screen.findByRole('link', { name: '2026-09-27, 0 consultas' }))
-  expect(screen.getByRole('heading', { name: '27 de Setembro' })).toBeVisible()
+  expect(await screen.findByRole('heading', { name: '27 de Setembro' })).toBeVisible()
   expect(screen.getByText('2026, Domingo')).toBeVisible()
 })
 
 it('permite navegar por um dia interno ao mês selecionado', async () => {
   renderCalendar()
   fireEvent.click(await screen.findByRole('link', { name: '2026-10-01, 3 consultas' }))
-  expect(screen.getByRole('heading', { name: '1 de Outubro' })).toBeVisible()
+  expect(await screen.findByRole('heading', { name: '1 de Outubro' })).toBeVisible()
   expect(screen.getByText('2026, Quinta-feira')).toBeVisible()
 })
 

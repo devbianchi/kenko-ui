@@ -25,10 +25,10 @@ it('dimensiona série horária pelos dados recebidos e preserva zeros', () => {
   expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('78101417')
 })
 
-it('agrupa horários no limite do meio-dia e trata valores zero', () => {
-  const { rerender } = render(<DayPeriodChart hours={[11, 12, 15]} counts={[2, 3, 1]} />)
+it('mostra manhã e tarde como a API entrega e trata valores zero', () => {
+  const { rerender } = render(<DayPeriodChart morning={2} afternoon={4} />)
   expect(screen.getByRole('img', { name: 'Manhã: 2; Tarde: 4' })).toBeVisible()
-  rerender(<DayPeriodChart hours={[11, 12]} counts={[0, 0]} />)
+  rerender(<DayPeriodChart morning={0} afternoon={0} />)
   expect(screen.getByRole('img', { name: 'Manhã: 0; Tarde: 0' })).toBeVisible()
 })
 
