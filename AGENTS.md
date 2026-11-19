@@ -1,6 +1,6 @@
 # Kenko UI — orientação para agentes
 
-Frontend acadêmico de atendimento e agendamento de consultas. O visitante usa o bot por menus no Showcase; Home, Calendário, Dia e Analytics apresentam agenda e indicadores. As páginas ainda leem mocks; a integração com a API está em andamento, página a página, conforme [o plano de integração](.agents/plans/integracao-api.md).
+Frontend acadêmico de atendimento e agendamento de consultas. O visitante usa o bot por menus no Showcase; Home, Calendário, Dia e Analytics apresentam agenda e indicadores. Todas as páginas consomem a API, conforme [o plano de integração](.agents/plans/integracao-api.md); os mocks servem de fixtures de teste.
 
 ## Comece aqui
 

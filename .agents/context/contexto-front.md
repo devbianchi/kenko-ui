@@ -30,7 +30,7 @@ Leia esta introdução e as seções afetadas, sem carregar todos os complemento
 
 ### Etapa atual: integração com a API
 
-As páginas passam a consumir a Kenko API, uma por vez, conforme o [plano de integração](../plans/integracao-api.md). A fundação está em `src/shared/api/`: URL base por `VITE_API_URL`, cliente HTTP que desembrulha `{meta, data}` e transforma `{error}` em `ApiError`, e TanStack Query para as leituras. `src/shared/components/QueryState.tsx` mostra carregamento, dados ou erro, com a tela de data inválida para os códigos de parâmetro recusado. Páginas ainda não migradas continuam com os mocks locais, que também servem de fixtures de teste. Não criar backend, servidor simulado ou testes de banco neste repositório: a API real fica no repositório `kenko-api`, e o contrato autoritativo é o `docs/endpoint/README.md` de lá.
+Todas as páginas consomem a Kenko API, conforme o [plano de integração](../plans/integracao-api.md); o Showcase usa o estado próprio em `src/features/showcase/useShowcase.ts`, e as leituras dos painéis usam TanStack Query. A fundação está em `src/shared/api/`: URL base por `VITE_API_URL`, cliente HTTP que desembrulha `{meta, data}` e transforma `{error}` em `ApiError`, e TanStack Query para as leituras. `src/shared/components/QueryState.tsx` mostra carregamento, dados ou erro, com a tela de data inválida para os códigos de parâmetro recusado. Os mocks locais servem de fixtures de teste e têm a mesma estrutura das respostas reais. Não criar backend, servidor simulado ou testes de banco neste repositório: a API real fica no repositório `kenko-api`, e o contrato autoritativo é o `docs/endpoint/README.md` de lá.
 
 ## 2. Base técnica e limites
 
