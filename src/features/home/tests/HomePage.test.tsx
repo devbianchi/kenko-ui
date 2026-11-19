@@ -1,17 +1,30 @@
+import type { ReactElement } from 'react'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { homeMock } from '../../../../mocks/home/home'
 import { AppLayout } from '../../../shared/layout/AppLayout'
 import { HomePage } from '../pages/HomePage'
-import { homeData } from '../data/home'
 import type { HomeData, UpcomingAppointment } from '../data/home'
+import { envelope, jsonResponse, stubFetch } from '../../../test/http'
+import { createTestQueryClient } from '../../../test/renderWithProviders'
+
+const homeData: HomeData = homeMock.data
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-11-20T12:00:00-03:00'))
 })
 afterEach(() => vi.useRealTimers())
+
+/** Página sem dados por props: busca na API, aqui substituída por uma resposta com o fixture. */
+function renderWithApi(ui: ReactElement, data: HomeData = homeData) {
+  const fetchMock = stubFetch(() => jsonResponse(envelope(data)))
+  render(<QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>)
+  return fetchMock
+}
 
 function renderHome(data: HomeData = structuredClone(homeData), route = '/home') {
   return render(<MemoryRouter initialEntries={[route]}><Routes>
@@ -31,9 +44,10 @@ it('não publica rascunhos do ano e restaura campo, URL e dados ao voltar', asyn
     return <><HomePage /><output aria-label="URL atual">{location.search}</output>
       <button onClick={() => navigate(-1)}>Voltar</button></>
   }
-  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo&view=cards']}><Routes>
+  renderWithApi(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo&view=cards']}><Routes>
     <Route element={<AppLayout />}><Route path="/home" element={<Example />} /></Route>
   </Routes></MemoryRouter>)
+  await screen.findByLabelText('Mês selecionado: 2026-11')
   await user.click(screen.getByLabelText('Mês e ano'))
   const year = screen.getByRole('spinbutton', { name: 'Ano' })
   await user.clear(year)
@@ -89,9 +103,10 @@ it('grava o mês na URL, preserva outros parâmetros e restaura o período ao vo
     return <><HomePage /><output aria-label="URL atual">{location.search}</output>
       <button onClick={() => navigate(-1)}>Voltar</button></>
   }
-  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo']}><Routes>
+  renderWithApi(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo']}><Routes>
     <Route element={<AppLayout />}><Route path="/home" element={<Example />} /></Route>
   </Routes></MemoryRouter>)
+  await screen.findByLabelText('Mês selecionado: 2026-11')
   await user.click(screen.getByLabelText('Mês e ano'))
   await user.selectOptions(screen.getByRole('combobox', { name: 'Mês' }), '10')
   expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2026-11&origin=demo')
@@ -161,7 +176,7 @@ it.each([
     const location = useLocation()
     return <><HomePage /><output aria-label="URL atual">{location.search}</output></>
   }
-  render(<MemoryRouter initialEntries={[`/home?month=${invalidMonth}&origin=demo`]}><Routes>
+  renderWithApi(<MemoryRouter initialEntries={[`/home?month=${invalidMonth}&origin=demo`]}><Routes>
     <Route element={<AppLayout />}><Route path="/home" element={<CurrentPage />} /></Route>
   </Routes></MemoryRouter>)
   await vi.waitFor(() => expect(screen.getByLabelText('URL atual')).toHaveTextContent(`?month=${expectedMonth}&origin=demo`))
@@ -175,7 +190,7 @@ it('substitui o mês inválido sem adicionar uma entrada ao histórico', async (
     return <><HomePage /><output aria-label="URL atual">{location.search}</output>
       <button onClick={() => navigate(-1)}>Voltar</button></>
   }
-  render(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo', '/home?month=2020-01&origin=demo']}><Routes>
+  renderWithApi(<MemoryRouter initialEntries={['/home?month=2026-11&origin=demo', '/home?month=2020-01&origin=demo']}><Routes>
     <Route element={<AppLayout />}><Route path="/home" element={<CurrentPage />} /></Route>
   </Routes></MemoryRouter>)
   await vi.waitFor(() => expect(screen.getByLabelText('URL atual')).toHaveTextContent('?month=2024-01&origin=demo'))
@@ -193,43 +208,55 @@ it.each([
   expect(screen.getByRole('heading', { name: heading })).toBeVisible()
 })
 
-it('ordena e limita próximas a cinco, exclui canceladas, completas e início igual a agora', () => {
-  vi.setSystemTime(new Date('2026-11-10T12:00:00-03:00'))
+it('mostra as próximas consultas como a API entrega, sem refiltrar pelo relógio do navegador', () => {
+  // O navegador está depois do início da primeira consulta: a lista continua a da API, na ordem dela.
+  vi.setSystemTime(new Date('2026-11-30T12:00:00-03:00'))
   const base = homeData.upcomingAppointments[0]
-  const make = (id: string, startsAt: string, status: UpcomingAppointment['status'] = 'pending'): UpcomingAppointment => ({
-    ...base, id, startsAt, status, patient: { id, name: id },
+  const make = (id: string, startsAt: string): UpcomingAppointment => ({
+    ...base, id, startsAt, patient: { id, name: id },
   })
   const appointments = [
-    make('sexta', '2026-11-16T13:00:00-03:00'),
-    make('segunda', '2026-11-12T13:00:00-03:00'),
-    make('quinta', '2026-11-15T13:00:00-03:00'),
     make('primeira', '2026-11-11T01:00:00Z'),
-    make('quarta', '2026-11-14T13:00:00-03:00'),
+    make('segunda', '2026-11-12T13:00:00-03:00'),
     make('terceira', '2026-11-13T13:00:00-03:00'),
-    make('cancelada', '2026-11-10T12:01:00-03:00', 'cancelled'),
-    make('completa', '2026-11-10T12:02:00-03:00', 'complete'),
-    make('agora', '2026-11-10T12:00:00-03:00'),
-    make('passada', '2026-11-10T11:00:00-03:00'),
   ]
   renderHome({ ...homeData, upcomingAppointments: appointments })
-  const list = screen.getByRole('list')
-  const items = within(list).getAllByRole('article')
-  expect(items).toHaveLength(5)
+  const items = within(screen.getByRole('list')).getAllByRole('article')
   expect(items.map(item => item.getAttribute('aria-label'))).toEqual([
-    'Consulta de primeira', 'Consulta de segunda', 'Consulta de terceira', 'Consulta de quarta', 'Consulta de quinta',
+    'Consulta de primeira', 'Consulta de segunda', 'Consulta de terceira',
   ])
   expect(items[0]).toHaveTextContent('22:00')
-  expect(items[0]).not.toHaveTextContent('11/11/2026')
-  expect(items[1]).not.toHaveTextContent('12/11/2026')
   expect(items[1]).not.toHaveTextContent('Dra. Helena')
-  expect(appointments[0].id).toBe('sexta')
 })
 
-it('mostra estado vazio quando o mock envelhece', () => {
-  vi.setSystemTime(new Date('2026-11-21T12:00:00-03:00'))
-  renderHome()
-  expect(screen.getByText('Nenhuma consulta futura agendada.')).toBeVisible()
-  expect(screen.queryByRole('list')).not.toBeInTheDocument()
+it('busca na API o mês da URL e mostra os indicadores recebidos', async () => {
+  const fetchMock = renderWithApi(<MemoryRouter initialEntries={['/home?month=2026-10']}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<HomePage />} /></Route>
+  </Routes></MemoryRouter>)
+
+  expect(screen.getByRole('status')).toHaveTextContent('Carregando…')
+  expect(await screen.findByRole('article', { name: 'Completas' })).toHaveTextContent('10')
+  expect(screen.getByLabelText('Mês selecionado: 2026-10')).toBeVisible()
+  expect(String(fetchMock.mock.calls[0]![0])).toBe('http://localhost:8080/api/dashboard?month=2026-10')
+})
+
+it('mostra o erro da API e busca de novo pelo botão', async () => {
+  const user = userEvent.setup()
+  let chamadas = 0
+  stubFetch(() => {
+    chamadas += 1
+    return chamadas === 1
+      ? jsonResponse({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno. Tente novamente.' } }, 500)
+      : jsonResponse(envelope(homeData))
+  })
+  render(<QueryClientProvider client={createTestQueryClient()}><MemoryRouter initialEntries={['/home?month=2026-11']}><Routes>
+    <Route element={<AppLayout />}><Route path="/home" element={<HomePage />} /></Route>
+  </Routes></MemoryRouter></QueryClientProvider>)
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar os dados.')
+  expect(screen.queryByRole('article', { name: 'Completas' })).not.toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
+  expect(await screen.findByRole('article', { name: 'Completas' })).toHaveTextContent('10')
 })
 
 it('trata ausência de rankings e duração sem trocar zero por ausência', () => {
