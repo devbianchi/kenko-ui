@@ -3,15 +3,28 @@ import { useNavigate, useParams } from 'react-router'
 import { InvalidDate } from '../../../shared/components/InvalidDate'
 import { DashboardCard, CountCard } from '../../../shared/components/DashboardCard'
 import { MonthTransition } from '../../../shared/components/MonthTransition'
+import { QueryState } from '../../../shared/components/QueryState'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
-import { diaMock } from '../../../../mocks/day/dia'
+import { useDay } from '../api'
 import { DayPeriodChart } from '../components/DayPeriodChart'
 import { HourlyAppointmentsChart } from '../components/HourlyAppointmentsChart'
 
+// Formato de data em GET /api/calendar/days/{date}. Os percentuais chegam sem arredondamento.
 export type DayData = {
-  summary: { total: number; complete: number; pending: number; cancelled: number }
+  date: string
+  summary: { total: number; complete: number; pending: number; cancelled: number; completionPercentage: number | null }
   appointmentsByHour: { hours: readonly number[]; counts: readonly number[] }
-  rooms: readonly { id: string; name: string; appointmentCount: number; cancelledCount: number; totalSlots: number; occupiedSlots: number; peakHour: number | null }[]
+  appointmentsByDayPeriod: { morning: number; afternoon: number }
+  rooms: readonly {
+    id: string
+    name: string
+    appointmentCount: number
+    cancelledCount: number
+    totalSlots: number
+    occupiedSlots: number
+    occupancyPercentage: number | null
+    peakHour: number | null
+  }[]
 }
 
 function parseDate(value: string | undefined) {
@@ -39,9 +52,9 @@ function formatDateHeading(date: Date) {
   return { title: `${day} de ${month}`, subtitle: `${year}, ${weekday}` }
 }
 
-function formatOccupancy(occupied: number, capacity: number) {
-  if (capacity <= 0) return '—'
-  return `${Math.round((occupied / capacity) * 100)}%`
+/** A API calcula o percentual; a apresentação só arredonda. Sem base (null), mostra "—". */
+function formatPercentage(value: number | null) {
+  return value === null ? '—' : `${Math.round(value)}%`
 }
 
 function DayContent({ date, data, transitioning }: { date: string; data: DayData; transitioning: boolean }) {
@@ -79,7 +92,7 @@ function DayContent({ date, data, transitioning }: { date: string; data: DayData
         <CountCard label="Canceladas" value={summary.cancelled} tone="cancelled" />
         <CountCard label="Completas" value={summary.complete} />
         <CountCard label="Pendentes" value={summary.pending} />
-        <CountCard label="Taxa de Completude" value={summary.total === 0 ? null : Math.round(summary.complete / summary.total * 100)} suffix="%" tone="primary" />
+        <CountCard label="Taxa de Completude" value={summary.completionPercentage === null ? null : Math.round(summary.completionPercentage)} suffix="%" tone="primary" />
       </section>
 
       <div className="grid grid-cols-1 gap-4 min-[900px]:grid-cols-[minmax(0,0.58fr)_minmax(0,1.12fr)]">
@@ -88,7 +101,7 @@ function DayContent({ date, data, transitioning }: { date: string; data: DayData
             <HourlyAppointmentsChart hours={appointmentsByHour.hours} counts={appointmentsByHour.counts} />
           </DashboardCard>
           <DashboardCard label="Resumo por período" className="p-4">
-            <DayPeriodChart hours={appointmentsByHour.hours} counts={appointmentsByHour.counts} />
+            <DayPeriodChart morning={data.appointmentsByDayPeriod.morning} afternoon={data.appointmentsByDayPeriod.afternoon} />
           </DashboardCard>
         </div>
 
@@ -109,7 +122,7 @@ function DayContent({ date, data, transitioning }: { date: string; data: DayData
                   <tr key={room.id} className="rounded-lg bg-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:scale-102 motion-safe:active:scale-100 motion-reduce:transition-none">
                     <th scope="row" className="rounded-l-lg border-y border-l border-border px-2 py-2 font-medium">{room.name}</th>
                     <td className="border-y border-border px-2 py-2">{room.appointmentCount}{room.cancelledCount ? ` (${room.cancelledCount})` : ''}</td>
-                    <td className="border-y border-border px-2 py-2">{formatOccupancy(room.occupiedSlots, room.totalSlots)}</td>
+                    <td className="border-y border-border px-2 py-2">{formatPercentage(room.occupancyPercentage)}</td>
                     <td className="rounded-r-lg border-y border-r border-border px-2 py-2">{room.peakHour === null ? '—' : `${String(room.peakHour).padStart(2, '0')}:00`}</td>
                   </tr>
                 ))}
@@ -122,20 +135,35 @@ function DayContent({ date, data, transitioning }: { date: string; data: DayData
   )
 }
 
-export function DayPage({ data = diaMock.data }: { data?: DayData }) {
-  const { date = '' } = useParams()
-  const month = date.slice(0, 7)
-  if (!parseDate(date) || month < MIN_SELECTABLE_MONTH || month > currentBusinessMonth()) {
-    return (
-      <InvalidDate message="Ops! parece que tivemos um problema ao buscar a data que você forneceu."
-        returnTo="/calendar" returnLabel="Voltar ao Calendário">
-        <li>Foi inserida corretamente (Ex. 2026-11-10)</li>
-        <li>Está entre o período suportado pela aplicação</li>
-        <li>(Janeiro de 2024 ao mês e ano atuais)</li>
-      </InvalidDate>
-    )
-  }
+function InvalidDay() {
+  return (
+    <InvalidDate message="Ops! parece que tivemos um problema ao buscar a data que você forneceu."
+      returnTo="/calendar" returnLabel="Voltar ao Calendário">
+      <li>Foi inserida corretamente (Ex. 2026-11-10)</li>
+      <li>Está entre o período suportado pela aplicação</li>
+      <li>(Janeiro de 2024 ao mês e ano atuais)</li>
+    </InvalidDate>
+  )
+}
+
+function DayTransition({ date, data }: { date: string; data: DayData }) {
   return <MonthTransition value={date}>{(displayedDate, transitioning) => (
     <DayContent date={displayedDate} data={data} transitioning={transitioning} />
   )}</MonthTransition>
+}
+
+// Sem dados anteriores na troca de dia: manter o dia anterior durante a animação mostraria o
+// título de uma data com os números de outra.
+function DayLoader({ date }: { date: string }) {
+  const query = useDay(date)
+  return <QueryState query={query} invalid={<InvalidDay />}>{data => <DayTransition date={date} data={data} />}</QueryState>
+}
+
+/** Com data, apresenta os dados recebidos (usado nos testes); sem data, busca a data da rota na API. */
+export function DayPage({ data }: { data?: DayData }) {
+  const { date = '' } = useParams()
+  const month = date.slice(0, 7)
+  // A validação local evita chamar a API com uma data que o painel não permite.
+  if (!parseDate(date) || month < MIN_SELECTABLE_MONTH || month > currentBusinessMonth()) return <InvalidDay />
+  return data ? <DayTransition date={date} data={data} /> : <DayLoader date={date} />
 }

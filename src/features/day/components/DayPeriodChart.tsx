@@ -1,12 +1,7 @@
-import { alignedPoints, type HourlySeries } from './hourlySeries'
-
-export function DayPeriodChart(series: HourlySeries) {
-  const totals = alignedPoints(series).reduce((periods, { hour, count }) => {
-    const key = hour < 12 ? 'morning' : 'afternoon'
-    periods[key] += count
-    return periods
-  }, { morning: 0, afternoon: 0 })
-  const maximum = Math.max(totals.morning, totals.afternoon)
+/** Manhã (antes de 12h) e tarde, como a API entrega: o corte é feito no servidor, no fuso de negócio. */
+export function DayPeriodChart({ morning, afternoon }: { morning: number; afternoon: number }) {
+  const totals = { morning, afternoon }
+  const maximum = Math.max(morning, afternoon)
 
   return (
     <figure aria-label="Resumo por período">
