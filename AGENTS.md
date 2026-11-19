@@ -1,6 +1,6 @@
 # Kenko UI — orientação para agentes
 
-Frontend acadêmico de atendimento e agendamento de consultas. O visitante usa o bot por menus no Showcase; Home, Calendário, Dia e Analytics apresentam agenda e indicadores. A base atual contém páginas placeholder, não funcionalidades já integradas.
+Frontend acadêmico de atendimento e agendamento de consultas. O visitante usa o bot por menus no Showcase; Home, Calendário, Dia e Analytics apresentam agenda e indicadores. Todas as páginas consomem a API, conforme [o plano de integração](.agents/plans/integracao-api.md); os mocks servem de fixtures de teste.
 
 ## Comece aqui
 
@@ -24,4 +24,4 @@ Requisitos aprovados orientam o comportamento; código/configuração descrevem 
 - [Reviewer](.agents/skills/reviewer/SKILL.md): revisão independente, quando solicitado como Reviewer; não usar na sessão que escreveu o código.
 - [Git workflow](.agents/skills/git-workflow/SKILL.md): quando solicitado branch, commit, push ou merge; executar apenas as operações autorizadas.
 
-As skills definem procedimentos; as regras do produto e as [convenções de testes de UI](.agents/context/contexto-front.md#testes-de-ui-ferramentas-e-organização) ficam no contexto. A etapa atual é um protótipo com mocks; os testes não dependem de backend. Comandos estão no README.
+As skills definem procedimentos; as regras do produto e as [convenções de testes de UI](.agents/context/contexto-front.md#testes-de-ui-ferramentas-e-organização) ficam no contexto. A etapa atual é a integração com a API; os testes não dependem de backend, porque a rede é substituída em `src/test/http.ts`. Comandos estão no README.

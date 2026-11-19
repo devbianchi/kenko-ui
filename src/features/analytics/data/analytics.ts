@@ -1,14 +1,10 @@
-import { analyticsMock } from '../../../../mocks/analytics/analytics'
 import { formatDuration } from '../../../shared/utils/duration'
 import { businessToday } from '../../../shared/utils/month'
 import { isValidReference, type PeriodSelection } from '../../../shared/utils/period'
 
-const mockMonth = '2026-10'
-
 export function readAnalyticsPeriod(params: URLSearchParams, today = businessToday()): PeriodSelection | null {
-  if (!params.has('period') && !params.has('reference')) {
-    return { period: 'month', reference: mockMonth <= today.slice(0, 7) ? mockMonth : today.slice(0, 7) }
-  }
+  // Sem filtro na URL, abre o mês atual de Brasília.
+  if (!params.has('period') && !params.has('reference')) return { period: 'month', reference: today.slice(0, 7) }
   if (params.getAll('period').length > 1 || params.getAll('reference').length > 1) return null
   const period = params.get('period') ?? 'month'
   const reference = params.get('reference') ?? ''
@@ -42,6 +38,7 @@ type Comparison = { difference: number | null; differenceUnit: 'percentage_point
 type PercentageKpi = Comparison & { percentage: number | null }
 type Bucket = { label: string; count: number; fromInclusive: number; toExclusive: number | null }
 
+// Formato de data em GET /api/analytics, conforme o contrato da API.
 export type AnalyticsData = {
   kpis: {
     botCompletion: PercentageKpi
@@ -55,24 +52,12 @@ export type AnalyticsData = {
   durationDistribution: { median: number | null; p90: number | null; buckets: readonly Bucket[] }
   conversationHeatmap: { bucketStartHours: readonly number[]; rows: readonly { weekday: number; counts: readonly number[] }[] }
   completionSeries: {
-    grouping: 'month_blocks' | 'day' | 'month'
+    // Pontos diários na semana, blocos de dias no mês e meses no ano.
+    grouping: 'daily' | 'month_blocks' | 'monthly'
     movingAverageWindow: number
-    points: readonly { label: string; percentage: number | null; movingAverage: number | null }[]
+    points: readonly { label: string; started: number; confirmed: number; percentage: number | null; movingAverage: number | null }[]
   }
   searchesWithoutSlotsBySpecialty: readonly { specialtyId: string; name: string; count: number }[]
-}
-
-export function analyticsFor({ period, reference }: PeriodSelection): AnalyticsData | null {
-  if (period !== 'month') return null
-  const data = analyticsMock.data
-  const [year, month] = reference.split('-').map(Number)
-  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
-  const points = data.completionSeries.points.flatMap(point => {
-    const [start, end] = point.label.split('–').map(Number)
-    if (start > lastDay) return []
-    return [{ ...point, label: end > lastDay ? `${String(start).padStart(2, '0')}–${lastDay}` : point.label }]
-  })
-  return { ...data, completionSeries: { ...data.completionSeries, points } }
 }
 
 export function percent(value: number | null, digits = 1) {

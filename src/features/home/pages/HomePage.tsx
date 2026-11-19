@@ -2,13 +2,25 @@ import { useSearchParams } from 'react-router'
 import { CountCard, MetricCard } from '../../../shared/components/DashboardCard'
 import { MonthTransition } from '../../../shared/components/MonthTransition'
 import { UpcomingAppointments } from '../components/UpcomingAppointments'
-import { durationDifference, formatDay, homeData, readHomeMonth } from '../data/home'
+import { QueryState } from '../../../shared/components/QueryState'
+import { useHome } from '../api'
+import { durationDifference, formatDay, readHomeMonth } from '../data/home'
 import { formatDuration } from '../../../shared/utils/duration'
 import type { HomeData } from '../data/home'
 
-export function HomePage({ data = homeData }: { data?: HomeData }) {
+/** Com data, apresenta os dados recebidos (usado nos testes); sem data, busca o mês da URL na API. */
+export function HomePage({ data }: { data?: HomeData }) {
   const [searchParams] = useSearchParams()
   const month = readHomeMonth(searchParams.get('month'))
+  return data ? <HomeContent data={data} month={month} /> : <HomeLoader month={month} />
+}
+
+function HomeLoader({ month }: { month: string }) {
+  const query = useHome(month)
+  return <QueryState query={query}>{data => <HomeContent data={data} month={month} />}</QueryState>
+}
+
+function HomeContent({ data, month }: { data: HomeData; month: string }) {
   const { bestDay, peakHour, bestRoom } = data
 
   return (
@@ -45,7 +57,7 @@ export function HomePage({ data = homeData }: { data?: HomeData }) {
               value={formatDuration(data.attendanceDuration.seconds)}
               detail={durationDifference(data.attendanceDuration.differenceSeconds)} />
           </section>
-          <UpcomingAppointments appointments={data.upcomingAppointments} now={new Date()} />
+          <UpcomingAppointments appointments={data.upcomingAppointments} />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { percent, type AnalyticsData } from '../data/analytics'
 
-type Series = AnalyticsData['completionSeries']
+// O gráfico só desenha rótulo, conclusão e média móvel; as contagens do ponto ficam fora.
+type Point = Pick<AnalyticsData['completionSeries']['points'][number], 'label' | 'percentage' | 'movingAverage'>
 const plotWidth = 600
 const plotHeight = 120
 
@@ -8,7 +9,7 @@ function xPosition(index: number, length: number) {
   return length === 1 ? plotWidth / 2 : index * plotWidth / (length - 1)
 }
 
-function linePath(points: Series['points'], field: 'percentage' | 'movingAverage') {
+function linePath(points: readonly Point[], field: 'percentage' | 'movingAverage') {
   let command = 'M'
   const parts: string[] = []
   points.forEach((point, index) => {
@@ -23,7 +24,7 @@ function linePath(points: Series['points'], field: 'percentage' | 'movingAverage
   return parts.join(' ')
 }
 
-export function CompletionChart({ points }: Pick<Series, 'points'>) {
+export function CompletionChart({ points }: { points: readonly Point[] }) {
   if (!points.length) return <p className="text-label text-text-muted">Sem dados no período.</p>
   return (
     <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-xs text-text-muted">

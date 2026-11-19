@@ -1,13 +1,15 @@
-import { calendarioMock } from '../../../../mocks/calendar/calendario'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
 
-export const calendarData = calendarioMock.data
-const CALENDAR_FALLBACK_MONTH = calendarData.today.slice(0, 7)
+/** Formato de data em GET /api/calendar: datas ausentes de countsByDate têm zero consultas. */
+export type CalendarData = {
+  today: string
+  countsByDate: Readonly<Record<string, number>>
+}
 
 export function readCalendarMonth(value: string | null) {
   const candidate = value && /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/.test(value)
     ? value
-    : CALENDAR_FALLBACK_MONTH
+    : currentBusinessMonth()
   const maximum = currentBusinessMonth()
   if (candidate < MIN_SELECTABLE_MONTH) return MIN_SELECTABLE_MONTH
   return candidate > maximum ? maximum : candidate
@@ -28,6 +30,20 @@ export function getVisibleCalendarDates(month: string) {
       inMonth: date.getUTCMonth() === monthNumber - 1,
     }
   })
+}
+
+function nextDay(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10)
+}
+
+/**
+ * Intervalo que a API conta: da primeira célula visível ao dia seguinte à última (fim excluído).
+ * A grade inclui dias dos meses vizinhos, e é o frontend que decide quantas semanas mostrar.
+ */
+export function getVisibleRange(month: string) {
+  const dates = getVisibleCalendarDates(month)
+  return { startDate: dates[0].date, endDateExclusive: nextDay(dates[dates.length - 1].date) }
 }
 
 export function formatCalendarMonthTitle(month: string) {

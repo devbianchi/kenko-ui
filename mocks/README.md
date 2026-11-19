@@ -36,7 +36,7 @@ Origem: exemplos da [API, §4](../.agents/context/completo/kenko-backend-api.md#
 
 - Showcase não mantém IDs, effectiveStatus, revision, step, attemptId, availableActions ou result; objetos conversation vazios foram removidos. Isso inclui IDs necessários a escolhas e deduplicação na integração.
 - shared/clinica.ts conserva apenas o nome. Endereço, telefone, expediente e especialidades continuam necessários ao fluxo de informações da clínica.
-- Calendário omite missingDateTotal; datas ausentes no mapa representam zero conforme o contrato.
+- Calendário: datas ausentes no mapa representam zero, conforme o contrato.
 - Home, Dia e Analytics omitem meta. O Dia conserva as 24 horas e as contagens originais.
 - Payloads de entrada, estado interno, erro genérico e listagem independente de reservas não têm fixtures próprios. Os contratos completos continuam nos complementos técnicos; a ausência de um cenário não elimina o requisito.
 

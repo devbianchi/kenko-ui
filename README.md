@@ -1,16 +1,18 @@
 # Kenko UI
 
-Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. Home, Calendário, Dia e Analytics usam mocks locais. O Showcase permite criar, selecionar e apagar conversas locais. A lista mostra “1m”, a mensagem inicial mostra “16:50” e as opções do bot são demonstrativas. A integração com a API está prevista para uma etapa posterior.
+Frontend do projeto Kenko, estruturado com React, TypeScript, Vite, Tailwind CSS 4 e React Router em Data Mode. Todas as páginas consomem a [Kenko API](https://github.com/devbianchi/kenko-api): Home, Calendário, Dia e Analytics leem os indicadores por TanStack Query, e o Showcase conduz o bot real, com a transcrição guardada no navegador. O caminho seguido está no [plano de integração](.agents/plans/integracao-api.md); os mocks em `mocks/` servem de fixtures de teste.
 
-A Home usa o resumo de novembro de 2026 em `mocks/home/home.ts`. O filtro mensal é mantido na URL (`/home?month=2026-11`); a seleção permite períodos de janeiro de 2024 até o mês atual em Brasília e muda apenas a apresentação do período e preserva os indicadores estáticos do mock. Próximas consultas usam o relógio real de Brasília: o exemplo de 20/11/2026 deixa de aparecer após seu início. Cards compartilhados, responsividade e movimento reduzido estão implementados; os cards laterais permanecem estáticos. A apresentação usa utilitários Tailwind, com tokens em `src/styles.css`, dimensões fluidas no desktop e escalas suaves de 1,02 no hover e retorno a 1 ao pressionar.
+A Home busca os indicadores do mês na API. O filtro mensal é mantido na URL (`/home?month=2026-11`); a seleção permite períodos de janeiro de 2024 até o mês atual em Brasília, e o padrão é o mês atual. Próximas consultas aparecem como a API entrega: até cinco pendentes com início futuro, pelo relógio do servidor. Cards compartilhados, responsividade e movimento reduzido estão implementados; os cards laterais permanecem estáticos. A apresentação usa utilitários Tailwind, com tokens em `src/styles.css`, dimensões fluidas no desktop e escalas suaves de 1,02 no hover e retorno a 1 ao pressionar.
 
 Home e Calendário compartilham o filtro mensal. Mês e ano ficam em rascunho até o envio do formulário **Aplicar**. Sair do campo com Tab mantém a edição. Um período incompleto ou fora da faixa exibe um alerta e desabilita Aplicar até a correção. Escape descarta a edição e devolve o foco ao seletor. Aplicar conserva os demais parâmetros da URL, e Voltar restaura a seleção anterior.
 
-No Calendário, cada data abre a página Dia. Durante o protótipo, o título acompanha a data selecionada e o resumo usa a mesma fixture. O gráfico horário apresenta as horas de início de 07h a 17h. Completude e ocupação são arredondadas ao inteiro mais próximo. Quando falta base para o cálculo, a página mostra “—”.
+No Calendário, a grade pede à API a contagem do intervalo visível, e o dia de hoje destacado vem da API. Cada data abre a página Dia, que busca o detalhe da data. O gráfico horário apresenta as horas de início de 07h a 17h. Completude, ocupação e manhã/tarde vêm calculadas da API e só são arredondadas ao inteiro na tela. Quando falta base para o cálculo, a página mostra “—”.
 
 ## Páginas e rotas
 
-Analytics abre em outubro de 2026. O filtro do cabeçalho usa `period` e `reference` na URL. Todos os meses usam os mesmos cinco indicadores e seis gráficos de `mocks/analytics/analytics.ts`, com os blocos da série limitados ao último dia do mês escolhido. Os percentuais dos cards são arredondados ao inteiro mais próximo. Semana e ano exibem um aviso de indisponibilidade porque o mock contém apenas agregados mensais.
+Analytics abre no mês atual. O filtro do cabeçalho usa `period` e `reference` na URL; semana, mês e ano buscam os cinco indicadores e os seis gráficos na API, e a série segue o agrupamento devolvido (dias, blocos do mês ou meses). Os percentuais dos cards são arredondados ao inteiro mais próximo.
+
+O Showcase cria conversas com um contato novo, renderiza a tela que o bot devolve (opções, horários, formulário do paciente, consultas e informações da clínica) e envia cada ação com `actionId` novo e a revisão atual. Uma falha de rede mantém a ação pendente para reenvio idêntico. Os ids conhecidos, as conversas ocultas e a transcrição ficam no `localStorage` (`kenko:showcase:v1:*`), sem nome nem nascimento do paciente. "Ocultar conversa" só retira a conversa da lista local.
 
 | Rota | Página |
 | --- | --- |
@@ -46,9 +48,14 @@ public/assets/          referências visuais aprovadas
 ## Desenvolvimento
 
 ```sh
-npm install
+npm ci
+cp .env.example .env
 npm run dev
 ```
+
+O frontend roda em `http://localhost:5173` (porta fixa: se estiver ocupada, o Vite falha em vez de trocar de porta). A URL da API vem de `VITE_API_URL` no `.env`; o padrão é `http://localhost:8080/api`. Abra o frontend por `localhost`, não por `127.0.0.1`, porque a API só libera as origens configuradas no CORS.
+
+Para subir a API com dados de demonstração, no repositório `kenko-api`: `docker compose up -d db`, `npm run db:migrate`, `npm run db:seed` e `npm run dev`.
 
 Para gerar a build de produção: `npm run build` (TypeScript e Vite). Para servir a build: `npm run preview`.
 
@@ -63,7 +70,7 @@ Os scripts disponíveis estão em [package.json](package.json). Lint ainda não 
 
 ## Testes
 
-Etapa atual: protótipo funcional com dados estáticos. Testes de UI não exigem backend/API/banco. Usar Node 22.12+ ou Node 24 e npm ci para instalar as versões do lockfile.
+Testes de UI não exigem backend, API nem banco: as chamadas de rede são substituídas por respostas montadas no próprio teste (`src/test/http.ts`), e `src/test/renderWithProviders.tsx` monta TanStack Query e roteador. Usar Node 22.12+ ou Node 24 e npm ci para instalar as versões do lockfile. No Node 25 ou mais novo, o `localStorage` experimental do Node encobre o do jsdom: rode os testes com `NODE_OPTIONS=--no-experimental-webstorage`.
 
 | Comando | Uso |
 | --- | --- |

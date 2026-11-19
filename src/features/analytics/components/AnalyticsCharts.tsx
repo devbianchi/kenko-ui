@@ -16,7 +16,7 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle: str
 }
 
 const asymmetricRow = 'grid gap-3 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]'
-const granularity = { month_blocks: 'Bloco do Mês', day: 'Dia', month: 'Mês' }
+const granularity = { month_blocks: 'Bloco do Mês', daily: 'Dia', monthly: 'Mês' }
 
 export function AnalyticsCharts({ data }: { data: AnalyticsData }) {
   const distribution = data.durationDistribution
