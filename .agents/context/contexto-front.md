@@ -28,13 +28,13 @@ Leia esta introdução e as seções afetadas, sem carregar todos os complemento
 - Integração: §7 e apenas a seção do contrato da operação.
 - Revisão: requisitos afetados e critérios correspondentes em §8.
 
-### Etapa atual: protótipo com mocks
+### Etapa atual: integração com a API
 
-A entrega atual é um protótipo funcional com dados estáticos. Implementar e testar componentes, navegação, interações e estados visíveis usando os mocks locais. As regras de domínio abaixo orientam a UI; contratos e garantias de API/banco descrevem a integração futura, não dependências nem critérios de execução desta etapa. Não criar backend, servidor simulado, testes de banco ou infraestrutura de rede para validar o protótipo. Os dados estáticos são autorizados nesta etapa e não comprovam persistência ou integração real.
+As páginas passam a consumir a Kenko API, uma por vez, conforme o [plano de integração](../plans/integracao-api.md). A fundação está em `src/shared/api/`: URL base por `VITE_API_URL`, cliente HTTP que desembrulha `{meta, data}` e transforma `{error}` em `ApiError`, e TanStack Query para as leituras. `src/shared/components/QueryState.tsx` mostra carregamento, dados ou erro, com a tela de data inválida para os códigos de parâmetro recusado. Páginas ainda não migradas continuam com os mocks locais, que também servem de fixtures de teste. Não criar backend, servidor simulado ou testes de banco neste repositório: a API real fica no repositório `kenko-api`, e o contrato autoritativo é o `docs/endpoint/README.md` de lá.
 
 ## 2. Base técnica e limites
 
-A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. Home, Calendário, Dia e Analytics apresentam protótipos com mocks. Home, Calendário e Analytics compartilham o seletor de período. Nenhuma página está integrada à API. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
+A base usa React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7 em Data Mode e Heroicons React, organizada por feature. Estrutura, rotas e comandos estão no README; scripts e versões efetivas estão no package.json. Home, Calendário, Dia e Analytics apresentam protótipos com mocks. Home, Calendário e Analytics compartilham o seletor de período. A integração das páginas à API segue o plano de integração. Reutilizar a organização existente não significa adotar seu comportamento incompleto como requisito.
 
 Biblioteca de gráficos, formulários, estado/cache, hospedagem e organização adicional continuam decisões de implementação, conforme a tarefa. Lint ainda não está configurado; quando solicitado pelas skills, registrar essa limitação sem alegar execução. A infraestrutura de testes está descrita abaixo.
 
@@ -51,7 +51,7 @@ Comandos no [README](../../README.md#testes). Configuração: [vitest.config.ts]
 - Usar .test.tsx quando houver JSX e .test.ts para lógica sem JSX. O runner descobre src/**/tests/**/*.test.{ts,tsx}; criar pastas apenas quando houver testes.
 - src/test/ contém somente preparação global e, se necessários, utilitários compartilhados. Fixtures específicas ficam junto do teste; reutilizar mocks/ quando os dados forem adequados ao cenário, sem acoplar asserções a todos os números ilustrativos.
 - Verificar comportamentos observáveis: conteúdo acessível, estado antes/depois da ação, navegação, entradas e resultados vazios relevantes. Preferir getByRole/getByLabelText, userEvent.setup() e await nas interações; findBy para mudanças assíncronas. Evitar snapshots extensos, classes Tailwind e detalhes internos como contrato do teste.
-- Instanciar dados e providers por teste. Usar MemoryRouter para navegação local. Não compartilhar estado mutável nem fazer chamadas reais de rede; não instalar MSW, E2E ou serviços enquanto o escopo não exigir.
+- Instanciar dados e providers por teste. Usar MemoryRouter para navegação local; para páginas com dados da API, usar `renderWithProviders` (`src/test/renderWithProviders.tsx`), que cria um cliente de consulta novo por teste. Não compartilhar estado mutável nem fazer chamadas reais de rede: substituir o fetch com `stubFetch`, `jsonResponse` e `envelope` (`src/test/http.ts`); o setup desfaz a substituição após cada teste. Não instalar MSW, E2E ou serviços enquanto o escopo não exigir.
 - Cobertura informa lacunas, sem percentual mínimo nesta etapa. Inclui arquivos de aplicação ainda não testados, excluindo testes, setup, declarações e bootstrap. O relatório HTML fica em coverage/index.html, ignorado pelo Git. Cobertura não comprova fidelidade visual; jsdom não valida layout/pixels de navegador.
 
 Exemplo funcional: [AppHeader.test.tsx](../../src/shared/layout/tests/AppHeader.test.tsx), que verifica navegação e link ativo com clique real simulado. As skills mantêm a divisão de checks entre implementação e revisão; não repetir a suíte completa apenas para gerar evidência duplicada.

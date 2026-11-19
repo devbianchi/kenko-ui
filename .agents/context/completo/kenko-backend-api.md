@@ -1,5 +1,7 @@
 # Kenko — Backend: endpoints, JSON e queries
 
+> **Autoridade:** em caso de divergência, vale o `docs/endpoint/README.md` do repositório `kenko-api`. Esta cópia é material de consulta para JSON de exemplo e queries conceituais.
+
 Especificação técnica da API acadêmica. Complementa o escopo consolidado — escopo-kenko-v2.md e o documento de fluxo e convenções do bot — kenko-bot-api.md.
 
 ## 1. Autoridade e limites
@@ -240,7 +242,6 @@ GET /api/calendar?startDate=2026-09-27&endDateExclusive=2026-11-01
 {
   "data": {
     "today": "2026-11-10",
-    "missingDateTotal": 0,
     "countsByDate": {
       "2026-09-30": 2,
       "2026-10-01": 3,
