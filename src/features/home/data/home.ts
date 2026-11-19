@@ -1,7 +1,6 @@
-import { homeMock } from '../../../../mocks/home/home'
 import { currentBusinessMonth, MIN_SELECTABLE_MONTH } from '../../../shared/utils/month'
 
-// Tipos de apresentação do protótipo; não são contratos da futura API.
+// Formato de data em GET /api/dashboard?month=YYYY-MM, conforme o contrato da API.
 export type UpcomingAppointment = {
   id: string
   status: 'pending' | 'complete' | 'cancelled'
@@ -14,7 +13,7 @@ export type UpcomingAppointment = {
 }
 
 export type HomeData = {
-  clinic: { name: string }
+  clinic: { id: string; name: string }
   appointments: { total: number; complete: number; pending: number; cancelled: number }
   bestDay: { date: string; appointmentCount: number } | null
   peakHour: { hour: number; appointmentCount: number; otherBusinessHoursAverage: number; aboveAverage: number } | null
@@ -23,13 +22,11 @@ export type HomeData = {
   upcomingAppointments: readonly UpcomingAppointment[]
 }
 
-export const HOME_MOCK_MONTH = '2026-11'
-export const homeData: HomeData = homeMock.data
 export const businessTimeZone = 'America/Sao_Paulo'
 
 export function readHomeMonth(value: string | null) {
-  const month = value && /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : HOME_MOCK_MONTH
   const maxMonth = currentBusinessMonth()
+  const month = value && /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : maxMonth
   if (month < MIN_SELECTABLE_MONTH) return MIN_SELECTABLE_MONTH
   return month > maxMonth ? maxMonth : month
 }
@@ -43,11 +40,4 @@ export function durationDifference(seconds: number | null) {
   if (seconds === 0) return 'Sem variação em relação ao mês anterior'
   const difference = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(Math.abs(seconds))
   return `${seconds < 0 ? 'Melhoria' : 'Aumento'} de ${difference}s em relação ao mês anterior`
-}
-
-export function selectUpcoming(appointments: readonly UpcomingAppointment[], now: Date) {
-  return appointments
-    .filter(appointment => appointment.status === 'pending' && new Date(appointment.startsAt).getTime() > now.getTime())
-    .sort((first, second) => Date.parse(first.startsAt) - Date.parse(second.startsAt))
-    .slice(0, 5)
 }

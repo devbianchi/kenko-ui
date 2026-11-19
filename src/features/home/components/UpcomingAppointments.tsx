@@ -1,13 +1,12 @@
 import { ForwardIcon } from '@heroicons/react/24/outline'
 import { DashboardCard } from '../../../shared/components/DashboardCard'
-import { businessTimeZone, selectUpcoming } from '../data/home'
+import { businessTimeZone } from '../data/home'
 import type { UpcomingAppointment } from '../data/home'
 
-export function UpcomingAppointments({ appointments, now }: {
-  appointments: readonly UpcomingAppointment[]
-  now: Date
-}) {
-  const upcoming = selectUpcoming(appointments, now)
+// A API já entrega até cinco pendentes com início futuro, em ordem, pelo relógio dela: refiltrar com o
+// relógio do navegador poderia esconder ou mostrar consultas diferentes das do servidor.
+export function UpcomingAppointments({ appointments }: { appointments: readonly UpcomingAppointment[] }) {
+  const upcoming = appointments
 
   return (
     <section aria-labelledby="upcoming-title">
